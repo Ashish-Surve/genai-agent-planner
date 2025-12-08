@@ -31,3 +31,20 @@ def mock_settings(monkeypatch, test_data_dir):
     from adhd_planner.utils.config import reload_settings
 
     return reload_settings()
+
+
+@pytest.fixture
+def test_db_session(mock_settings, monkeypatch):
+    """Create test database session."""
+    from src.database.connection import DatabaseManager
+
+    # Create a fresh database manager for the test
+    db = DatabaseManager()
+    db.create_tables()
+
+    session = db.session_factory()
+    yield session
+
+    # Clean up
+    session.close()
+    db.drop_tables()
