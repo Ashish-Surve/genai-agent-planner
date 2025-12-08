@@ -208,11 +208,11 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 
 Update this section as you complete stories:
 
-- **Completed Stories**: 6/33
+- **Completed Stories**: 6/33 ✅
 - **Current Sprint**: Epic 2 - Core Services
-- **Current Story**: ADHD-6
-- **Hours Invested**: ~13
-- **Estimated Remaining**: ~76 hours
+- **Current Story**: ADHD-6 (Complete) / ADHD-7 (Next)
+- **Hours Invested**: ~15 hours
+- **Estimated Remaining**: ~74 hours
 
 ## Getting Help
 
