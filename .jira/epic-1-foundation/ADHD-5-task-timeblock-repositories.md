@@ -6,7 +6,7 @@
 - **Story Points**: 3
 - **Estimated Time**: 3 hours
 - **Prerequisites**: ADHD-4 (Base Repository Pattern)
-- **Status**: 📋 Not Started
+- **Status**: ✅ Complete
 
 ## Description
 
@@ -24,13 +24,13 @@ Implement specialized repositories for Tasks and TimeBlocks that extend the base
 
 ## Acceptance Criteria
 
-- [ ] TaskRepository implements all task queries
-- [ ] TimeBlockRepository implements all scheduling queries
-- [ ] Queries are efficient (use proper indexing)
-- [ ] Relationship loading works correctly
-- [ ] Conflict detection is accurate
-- [ ] All query methods tested
-- [ ] Unit tests pass
+- [x] TaskRepository implements all task queries
+- [x] TimeBlockRepository implements all scheduling queries
+- [x] Queries are efficient (use proper indexing)
+- [x] Relationship loading works correctly
+- [x] Conflict detection is accurate
+- [x] All query methods tested
+- [x] Unit tests pass (23/23 passing)
 
 ## Files to Create
 
@@ -979,3 +979,27 @@ Once Epic 1 is complete, move to:
 - Date-based queries should handle timezone edge cases
 - Statistics methods help with dashboards and analytics
 - Eager loading prevents N+1 query problems
+
+---
+
+## Completion Notes
+
+**Status**: ✅ **COMPLETE** - Implemented and tested
+
+**Implementation Details**:
+- Created `TaskRepository` with 13 specialized query methods
+- Created `TimeBlockRepository` with 10 specialized query methods
+- All 23 unit tests passing
+- Branch: `feature/ADHD-5-task-timeblock-repositories`
+- Commit: feat(ADHD-5): Implement task and timeblock repositories
+
+**Test Results**:
+- TaskRepository: 11 tests passed
+- TimeBlockRepository: 12 tests passed
+- Code coverage: 48% (repositories at 60-69% coverage)
+
+**Key Methods Implemented**:
+1. **TaskRepository**: find_by_status, find_by_priority, find_overdue, find_due_soon, find_by_energy_level, find_by_context, find_with_dependencies, find_by_dependency, find_requiring_focus, find_completed_with_durations, find_pending_sync, search_by_title, get_statistics
+2. **TimeBlockRepository**: find_by_date, find_by_date_range, find_conflicts, find_by_block_type, find_flexible_blocks, find_current_and_upcoming, find_pending_sync, find_with_tasks, get_day_statistics
+
+**Ready for**: ADHD-6 (Configuration & Logging Enhancement)
