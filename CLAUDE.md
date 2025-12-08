@@ -83,6 +83,6 @@ Committed-By: Claude by Ashish
 6. **ALWAYS push before creating PR** - Ensure branch is pushed to remote first
 7. **Use --base dev flag** - When creating PRs with gh CLI: `gh pr create --base dev`
 8. **Separate docs PRs** - Documentation updates should be in separate PRs from code changes
-
+9. **gh location** - /opt/homebrew/bin/gh
 ## My Identity
 I am Claude (Sonnet 4.5), working on behalf of Ashish on the ADHD-Planner project.
