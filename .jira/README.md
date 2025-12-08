@@ -29,7 +29,7 @@ Foundation layer - database, models, configuration.
 |-------|-------|------|--------|
 | ADHD-1 | Project Setup & Configuration | 2h | ✅ Complete |
 | ADHD-2 | Database Schema & Migrations | 3h | ✅ Complete |
-| ADHD-3 | Pydantic Models & Enums | 2h | 📋 Not Started |
+| ADHD-3 | Pydantic Models & Enums | 2h | ✅ Complete |
 | ADHD-4 | Base Repository Pattern | 2h | 📋 Not Started |
 | ADHD-5 | Task & TimeBlock Repositories | 3h | 📋 Not Started |
 
@@ -208,11 +208,11 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 
 Update this section as you complete stories:
 
-- **Completed Stories**: 2/33
+- **Completed Stories**: 3/33
 - **Current Sprint**: Epic 1 - Foundation
-- **Current Story**: ADHD-3
-- **Hours Invested**: 5
-- **Estimated Remaining**: ~84 hours
+- **Current Story**: ADHD-4
+- **Hours Invested**: 7
+- **Estimated Remaining**: ~82 hours
 
 ## Getting Help
 
@@ -227,7 +227,9 @@ If you get stuck on a story:
 
 1. ✅ ~~Read [ADHD-1: Project Setup](epic-1-foundation/ADHD-1-project-setup.md)~~ - **COMPLETE**
 2. ✅ ~~Read [ADHD-2: Database Schema](epic-1-foundation/ADHD-2-database-schema.md)~~ - **COMPLETE**
-3. 📍 Read [ADHD-3: Pydantic Models & Enums](epic-1-foundation/ADHD-3-pydantic-models.md)
-4. Start implementing ADHD-3!
+3. ✅ ~~Read [ADHD-3: Pydantic Models & Enums](epic-1-foundation/ADHD-3-pydantic-models-enums.md)~~ - **COMPLETE**
+4. 📍 Read [ADHD-4: Base Repository Pattern](epic-1-foundation/ADHD-4-base-repository-pattern.md)
+5. Start implementing ADHD-4!
+6. Update progress in this README when complete
 
 Good luck! Remember: progress over perfection. 🚀
