@@ -40,7 +40,7 @@ Business logic and service layer.
 
 | Story | Title | Time | Status |
 |-------|-------|------|--------|
-| ADHD-6 | Configuration & Logging | 2h | 📋 Not Started |
+| ADHD-6 | Configuration & Logging | 2h | ✅ Complete |
 | ADHD-7 | LLM Service & Provider Factory | 3h | 📋 Not Started |
 | ADHD-8 | Task Service | 3h | 📋 Not Started |
 | ADHD-9 | Calendar Service | 3h | 📋 Not Started |
@@ -208,11 +208,11 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 
 Update this section as you complete stories:
 
-- **Completed Stories**: 5/33
-- **Current Sprint**: Epic 1 - Foundation
+- **Completed Stories**: 6/33
+- **Current Sprint**: Epic 2 - Core Services
 - **Current Story**: ADHD-6
-- **Hours Invested**: ~12
-- **Estimated Remaining**: ~77 hours
+- **Hours Invested**: ~13
+- **Estimated Remaining**: ~76 hours
 
 ## Getting Help
 
@@ -230,6 +230,7 @@ If you get stuck on a story:
 3. ✅ ~~Read [ADHD-3: Pydantic Models & Enums](epic-1-foundation/ADHD-3-pydantic-models-enums.md)~~ - **COMPLETE**
 4. ✅ ~~Read [ADHD-4: Base Repository Pattern](epic-1-foundation/ADHD-4-base-repository-pattern.md)~~ - **COMPLETE**
 5. ✅ ~~Read [ADHD-5: Task & TimeBlock Repositories](epic-1-foundation/ADHD-5-task-timeblock-repositories.md)~~ - **COMPLETE**
-6. 📍 Read [ADHD-6: Configuration & Logging Enhancement](epic-2-services/ADHD-6-configuration-logging-enhancement.md)
+6. ✅ ~~Read [ADHD-6: Configuration & Logging Enhancement](epic-2-core-services/ADHD-6-configuration-logging-enhancement.md)~~ - **COMPLETE**
+7. 📍 Read [ADHD-7: LLM Service & Provider Factory](epic-2-core-services/ADHD-7-llm-service-provider-factory.md)
 
 Good luck! Remember: progress over perfection. 🚀
