@@ -59,25 +59,40 @@ adhd-planner/
 ├── README.md                 # This file
 ├── ARCHITECTURE.md           # Detailed system architecture
 ├── SETUP.md                  # Installation and setup guide
-├── requirements.txt          # Python dependencies
+├── pyproject.toml            # Project dependencies and configuration
+├── .env.example              # Environment variables template
 ├── docs/                     # Comprehensive documentation
 │   ├── architecture/         # Architecture and design docs
 │   ├── design/              # UI and workflow specifications
-│   ├── technical/           # Technical implementation details
-│   ├── implementation/      # Implementation guides
-│   ├── operations/          # Error handling, security, performance
-│   ├── user/                # End-user documentation
-│   └── api/                 # Data schemas and APIs
-└── src/                     # Source code (to be implemented)
+│   └── technical/           # Technical implementation details
+├── .jira/                    # Implementation stories and progress
+├── data/                     # Application data (gitignored except .gitkeep)
+│   ├── database/            # SQLite database files
+│   ├── config/              # Configuration files
+│   └── logs/                # Application logs
+├── scripts/                  # Utility scripts
+├── tests/                    # Test suite
+│   ├── unit/                # Unit tests
+│   ├── integration/         # Integration tests
+│   └── conftest.py          # Pytest configuration
+└── src/adhd_planner/        # Main package
     ├── agents/              # LangGraph agent implementations
-    ├── graph/               # Graph state and workflow definitions
-    ├── models/              # Data models (Pydantic)
-    ├── services/            # Business logic services
-    ├── repositories/        # Data access layer
-    ├── integrations/        # Apple and LLM integrations
-    ├── ui/                  # Streamlit user interface
+    ├── core/                # Core business logic
     ├── database/            # Database schema and migrations
+    ├── graph/               # Graph state and workflow definitions
+    ├── integrations/        # External integrations
+    │   ├── apple/          # Apple Reminders/Calendar
+    │   └── llm/            # LLM providers
+    ├── models/              # Data models (Pydantic)
+    ├── repositories/        # Data access layer
+    ├── services/            # Business logic services
+    ├── ui/                  # Streamlit user interface
+    │   ├── components/     # Reusable UI components
+    │   ├── pages/          # Application pages
+    │   └── styles/         # CSS and styling
     └── utils/               # Utilities and helpers
+        ├── config.py        # Configuration management
+        └── logger.py        # Logging setup
 ```
 
 ## Quick Start
@@ -94,24 +109,26 @@ adhd-planner/
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Clone the repository
-git clone <repository-url>
-cd adhd-planner
+git clone https://github.com/Ashish-Surve/genai-agent-planner.git
+cd genai-agent-planner
 
-# Install dependencies (uv handles venv and Python automatically)
-uv sync
+# Install dependencies including dev tools (uv handles venv and Python automatically)
+uv sync --extra dev
 
-# Configure environment
+# Configure environment (optional - has sensible defaults)
 cp .env.example .env
-# Edit .env with your settings
+# Edit .env with your settings (LLM provider, API keys, etc.)
 
-# Initialize database
-uv run python scripts/setup_database.py
+# Verify installation
+uv run python -c "from adhd_planner.utils.config import get_settings; print('✓ Setup successful')"
 
-# Run the application
-uv run streamlit run src/ui/app.py
+# Run tests
+uv run pytest tests/ -v
 ```
 
 **Using uv** provides 10-100x faster dependency installation and automatic Python version management.
+
+**Current Status**: Foundation complete (ADHD-1). Database and models coming in ADHD-2.
 
 For detailed setup instructions, see [SETUP.md](SETUP.md).
 

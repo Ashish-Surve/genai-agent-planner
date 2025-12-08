@@ -1,5 +1,20 @@
 # ADHD Planner - Setup Guide
 
+## Current Implementation Status
+
+**✅ ADHD-1 Complete (Foundation)**
+- Project structure and package setup
+- Configuration management with environment variables
+- Logging infrastructure
+- Testing framework with pytest
+- Code quality tools (ruff, black, mypy)
+
+**🚧 In Progress**
+- ADHD-2: Database Schema & Migrations (next)
+- Full application features coming in subsequent stories
+
+**Note**: The application is under active development. Follow the [implementation progress](.jira/README.md) to track completion of features.
+
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Installation](#installation)
@@ -72,12 +87,8 @@
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd adhd-planner
-
-# (Alternative) If you have a zip file
-unzip adhd-planner.zip
-cd adhd-planner
+git clone https://github.com/Ashish-Surve/genai-agent-planner.git
+cd genai-agent-planner
 ```
 
 ### 2. Install Dependencies with uv
@@ -87,8 +98,9 @@ cd adhd-planner
 # - Create a virtual environment (.venv)
 # - Install Python 3.10+ if needed
 # - Install all dependencies from pyproject.toml
+# - Install development tools (pytest, ruff, black, mypy)
 
-uv sync
+uv sync --extra dev
 
 # This creates .venv/ and installs all dependencies
 ```
@@ -97,7 +109,7 @@ uv sync
 - `uv sync` read `pyproject.toml`
 - Created a `.venv/` directory
 - Installed Python 3.10+ (if not available)
-- Installed all project dependencies
+- Installed all project dependencies including dev tools
 - Created a `uv.lock` file for reproducible builds
 
 ### 3. Verify Installation
@@ -106,24 +118,15 @@ uv sync
 # Check Python version (should be 3.10+)
 uv run python --version
 
-# Check installed packages
-uv pip list | grep -E "(langchain|langgraph|streamlit|sqlalchemy)"
+# Verify package imports work
+uv run python -c "from adhd_planner.utils.config import get_settings; print('✓ Installation successful')"
 
-# Or activate the virtual environment and use directly
-source .venv/bin/activate  # On macOS/Linux
-# .venv\Scripts\activate    # On Windows
+# Run tests to verify setup
+uv run pytest tests/ -v
 
-python --version
-```
-
-### 4. Install Development Dependencies (Optional)
-
-```bash
-# Install dev dependencies (testing, linting, etc.)
-uv sync --extra dev
-
-# Or if already synced:
-uv pip install -e ".[dev]"
+# Check code quality tools
+uv run ruff check src/ tests/
+uv run black --check src/ tests/
 ```
 
 ## Configuration
@@ -336,97 +339,90 @@ Edit user preferences (after first run) to specify:
 
 ## Running the Application
 
-### 1. Initialize Database
+### Current Status: Foundation Complete
+
+**What works now:**
+- Configuration loading from `.env` file
+- Logging to console and file
+- All tests passing
+- Code quality checks
+
+**Coming soon:**
+- Database initialization (ADHD-2)
+- Streamlit UI (ADHD-17+)
+- Full application features
+
+### Test Current Setup
 
 ```bash
-# Run database setup script
-uv run python scripts/setup_database.py
+# Test configuration loading
+uv run python -c "from adhd_planner.utils.config import get_settings; s = get_settings(); print(f'✓ Config loaded: LLM={s.llm_provider}')"
 
-# Should output:
-# ✓ Database created at data/database/adhd_planner.db
-# ✓ Tables created successfully
-# ✓ Default preferences inserted
+# Test logging
+uv run python -c "from adhd_planner.utils.logger import logger; logger.info('Test log message'); print('✓ Logging works')"
+
+# Run all tests
+uv run pytest tests/ -v --cov=src
+
+# Check logs were created
+ls -lh data/logs/app.log
+cat data/logs/app.log
 ```
 
-### 2. Verify Database
+### Once UI is Implemented (Coming Soon)
 
 ```bash
-# Check database file exists
-ls -lh data/database/adhd_planner.db
-
-# (Optional) Inspect with SQLite
-sqlite3 data/database/adhd_planner.db
-.tables
-.quit
-```
-
-### 3. Start the Application
-
-```bash
-# Start Streamlit app with uv
-uv run streamlit run src/ui/app.py
-
-# Alternative: Activate venv first, then run
-source .venv/bin/activate
-streamlit run src/ui/app.py
+# Start Streamlit app with uv (will be available after ADHD-17)
+uv run streamlit run src/adhd_planner/ui/app.py
 
 # Application should open in browser automatically
 # Or navigate to: http://localhost:8501
 ```
 
-### 4. Access the Application
-
-The app should automatically open in your default browser at:
-```
-http://localhost:8501
-```
-
-If not, manually open the URL shown in the terminal.
-
 ## Verification
 
-### 1. Check Application Status
+### Current Setup Verification (ADHD-1)
 
-Once the app is running, verify:
+Verify the foundation is working correctly:
 
-- [ ] Chat page loads without errors
-- [ ] Settings page shows current configuration
-- [ ] Can create a test task via chat
-- [ ] Task appears in Tasks page
-- [ ] Calendar view displays correctly
+- [ ] Dependencies installed: `uv run python --version` shows 3.10+
+- [ ] Configuration loads: `uv run python -c "from adhd_planner.utils.config import get_settings; print('✓')"`
+- [ ] Logging works: Check `data/logs/app.log` exists and has entries
+- [ ] Tests pass: `uv run pytest tests/ -v` shows 3/3 passed
+- [ ] Linting passes: `uv run ruff check src/ tests/` shows no errors
+- [ ] Formatting passes: `uv run black --check src/ tests/` shows all files formatted
 
-### 2. Test Core Functionality
+### Check Configuration Values
 
-```
-In Chat page, try:
-"Add a task: test task, 30 minutes"
-
-Expected result:
-- Agent responds confirming task creation
-- Task appears in Tasks page
-- If sync enabled, task appears in Apple Reminders
-```
-
-### 3. Test Apple Sync
-
-If you enabled sync:
-
-```
-1. Create task in ADHD Planner
-2. Check Apple Reminders app - task should appear
-3. Modify task in Apple Reminders
-4. Trigger sync in ADHD Planner
-5. Changes should appear in ADHD Planner
+```bash
+# View current configuration
+uv run python << 'EOF'
+from adhd_planner.utils.config import get_settings
+s = get_settings()
+print(f"LLM Provider: {s.llm_provider}")
+print(f"Database Path: {s.database_path}")
+print(f"Log Level: {s.log_level}")
+print(f"Max Focus Duration: {s.max_focus_duration} min")
+EOF
 ```
 
-### 4. Check Logs
+### Check Logs
 
 ```bash
 # View application logs
-tail -f data/logs/app.log
+cat data/logs/app.log
 
-# Should show startup messages and activity
+# Or follow logs in real-time
+tail -f data/logs/app.log
 ```
+
+### Future Verification (After ADHD-2+)
+
+Once more stories are complete, you'll be able to:
+- [ ] Initialize database and create tables
+- [ ] Create tasks via chat interface
+- [ ] View tasks in calendar
+- [ ] Sync with Apple Reminders/Calendar
 
 ## Troubleshooting
 

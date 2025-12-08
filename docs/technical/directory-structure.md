@@ -11,133 +11,139 @@ adhd-planner/
 ├── README.md                 # Project overview
 ├── ARCHITECTURE.md           # System architecture
 ├── SETUP.md                  # Installation guide
-├── requirements.txt          # Python dependencies
-├── setup.py                  # Package setup
+├── pyproject.toml            # Project configuration and dependencies
 ├── .env.example              # Example environment configuration
 ├── .gitignore               # Git ignore rules
 │
+├── .jira/                   # Implementation stories and tracking
 ├── docs/                    # Documentation
-├── src/                     # Source code
+├── src/                     # Source code (see below)
 ├── tests/                   # Test suites
-├── data/                    # Runtime data
+├── data/                    # Runtime data (gitignored)
 └── scripts/                 # Utility scripts
 ```
 
-## Source Code Structure (`src/`)
+## Source Code Structure (`src/adhd_planner/`)
+
+**Note**: The package is structured as `src/adhd_planner/` to follow Python packaging best practices. All imports use the `adhd_planner.` prefix.
 
 ```
 src/
-├── __init__.py
-│
-├── agents/                  # LangGraph Agent Implementations
-│   ├── __init__.py
-│   ├── base.py             # BaseAgent abstract class
-│   ├── supervisor.py       # Main orchestrator agent
-│   ├── planning_agent.py   # Task planning and creation
-│   ├── scheduling_agent.py # Schedule generation
-│   ├── suggestion_agent.py # Task suggestions
-│   ├── sync_agent.py       # Sync operations
-│   └── energy_agent.py     # Energy tracking
-│
-├── graph/                   # LangGraph Configuration
-│   ├── __init__.py
-│   ├── state.py            # AgentState definition
-│   ├── nodes.py            # Graph node functions
-│   ├── edges.py            # Routing/edge logic
-│   └── builder.py          # Graph construction
-│
-├── models/                  # Data Models (Pydantic)
-│   ├── __init__.py
-│   ├── task.py             # Task model
-│   ├── time_block.py       # TimeBlock model
-│   ├── user_preferences.py # UserPreferences model
-│   ├── energy_log.py       # EnergyLog model
-│   ├── calendar_event.py   # CalendarEvent model
-│   ├── sync_operation.py   # SyncOperation model
-│   └── enums.py            # Enum definitions
-│
-├── services/                # Business Logic Services
-│   ├── __init__.py
-│   ├── task_service.py     # Task CRUD and logic
-│   ├── calendar_service.py # Time block management
-│   ├── sync_service.py     # Sync orchestration
-│   ├── llm_service.py      # LLM provider abstraction
-│   ├── energy_service.py   # Energy tracking
-│   ├── notification_service.py  # Notifications
-│   └── time_estimation_service.py  # Duration prediction
-│
-├── repositories/            # Data Access Layer
-│   ├── __init__.py
-│   ├── base_repository.py  # Base repository pattern
-│   ├── task_repository.py
-│   ├── time_block_repository.py
-│   ├── user_preferences_repository.py
-│   ├── energy_log_repository.py
-│   └── sync_operation_repository.py
-│
-├── integrations/            # External Integrations
-│   ├── __init__.py
-│   │
-│   ├── apple/              # Apple Ecosystem
-│   │   ├── __init__.py
-│   │   ├── reminders.py    # Reminders API wrapper
-│   │   ├── calendar.py     # Calendar API wrapper
-│   │   └── permissions.py  # Permission handling
-│   │
-│   └── llm/                # LLM Providers
-│       ├── __init__.py
-│       ├── provider_factory.py  # Factory pattern
-│       ├── ollama_provider.py
-│       ├── gemini_provider.py
-│       └── claude_provider.py
-│
-├── ui/                      # Streamlit User Interface
-│   ├── __init__.py
-│   ├── app.py              # Main Streamlit app
-│   │
-│   ├── pages/              # Streamlit pages
-│   │   ├── __init__.py
-│   │   ├── chat.py         # Chat interface
-│   │   ├── calendar_view.py  # Calendar view
-│   │   ├── tasks.py        # Task management
-│   │   └── settings.py     # Settings page
-│   │
-│   ├── components/         # Reusable UI components
-│   │   ├── __init__.py
-│   │   ├── task_card.py
-│   │   ├── time_block_editor.py
-│   │   ├── energy_meter.py
-│   │   └── sync_status.py
-│   │
-│   └── styles/             # Custom styles
-│       └── custom.css
-│
-├── database/                # Database Layer
-│   ├── __init__.py
-│   ├── connection.py       # DB connection management
-│   ├── schema.py           # SQLAlchemy models
-│   └── migrations/         # Alembic migrations
-│       ├── alembic.ini
-│       ├── env.py
-│       └── versions/       # Migration versions
-│
-├── utils/                   # Utilities
-│   ├── __init__.py
-│   ├── config.py           # Configuration management
-│   ├── logger.py           # Logging setup
-│   ├── time_utils.py       # Time utilities
-│   ├── validation.py       # Validation helpers
-│   └── prompts/            # LLM prompts
-│       ├── planning_prompts.py
-│       ├── scheduling_prompts.py
-│       └── suggestion_prompts.py
-│
-└── core/                    # Core Application
+├── __init__.py              # Package marker for editable install
+└── adhd_planner/            # Main package (all imports use adhd_planner.*)
     ├── __init__.py
-    ├── session_manager.py  # Session management
-    ├── state_handler.py    # State handling
-    └── exceptions.py       # Custom exceptions
+    │
+    ├── agents/              # LangGraph Agent Implementations
+    │   ├── __init__.py
+    │   ├── base.py          # BaseAgent abstract class
+    │   ├── supervisor.py    # Main orchestrator agent
+    │   ├── planning_agent.py    # Task planning and creation
+    │   ├── scheduling_agent.py  # Schedule generation
+    │   ├── suggestion_agent.py  # Task suggestions
+    │   ├── sync_agent.py    # Sync operations
+    │   └── energy_agent.py  # Energy tracking
+    │
+    ├── core/                # Core Application Logic
+    │   ├── __init__.py
+    │   ├── session_manager.py   # Session management
+    │   ├── state_handler.py     # State handling
+    │   └── exceptions.py    # Custom exceptions
+    │
+    ├── database/            # Database Layer
+    │   ├── __init__.py
+    │   ├── connection.py    # DB connection management
+    │   ├── schema.py        # SQLAlchemy models
+    │   └── migrations/      # Alembic migrations
+    │       ├── alembic.ini
+    │       ├── env.py
+    │       └── versions/    # Migration versions
+    │
+    ├── graph/               # LangGraph Configuration
+    │   ├── __init__.py
+    │   ├── state.py         # AgentState definition
+    │   ├── nodes.py         # Graph node functions
+    │   ├── edges.py         # Routing/edge logic
+    │   └── builder.py       # Graph construction
+    │
+    ├── integrations/        # External Integrations
+    │   ├── __init__.py
+    │   ├── apple/           # Apple Ecosystem
+    │   │   ├── __init__.py
+    │   │   ├── reminders.py     # Reminders API wrapper
+    │   │   ├── calendar.py      # Calendar API wrapper
+    │   │   └── permissions.py   # Permission handling
+    │   └── llm/             # LLM Providers
+    │       ├── __init__.py
+    │       ├── provider_factory.py  # Factory pattern
+    │       ├── ollama_provider.py
+    │       ├── gemini_provider.py
+    │       └── claude_provider.py
+    │
+    ├── models/              # Data Models (Pydantic)
+    │   ├── __init__.py
+    │   ├── task.py          # Task model
+    │   ├── time_block.py    # TimeBlock model
+    │   ├── user_preferences.py  # UserPreferences model
+    │   ├── energy_log.py    # EnergyLog model
+    │   ├── calendar_event.py    # CalendarEvent model
+    │   ├── sync_operation.py    # SyncOperation model
+    │   └── enums.py         # Enum definitions
+    │
+    ├── repositories/        # Data Access Layer
+    │   ├── __init__.py
+    │   ├── base_repository.py   # Base repository pattern
+    │   ├── task_repository.py
+    │   ├── time_block_repository.py
+    │   ├── user_preferences_repository.py
+    │   ├── energy_log_repository.py
+    │   └── sync_operation_repository.py
+    │
+    ├── services/            # Business Logic Services
+    │   ├── __init__.py
+    │   ├── task_service.py      # Task CRUD and logic
+    │   ├── calendar_service.py  # Time block management
+    │   ├── sync_service.py      # Sync orchestration
+    │   ├── llm_service.py       # LLM provider abstraction
+    │   ├── energy_service.py    # Energy tracking
+    │   ├── notification_service.py  # Notifications
+    │   └── time_estimation_service.py  # Duration prediction
+    │
+    ├── ui/                  # Streamlit User Interface
+    │   ├── __init__.py
+    │   ├── app.py           # Main Streamlit app
+    │   ├── pages/           # Streamlit pages
+    │   │   ├── __init__.py
+    │   │   ├── chat.py      # Chat interface
+    │   │   ├── calendar_view.py # Calendar view
+    │   │   ├── tasks.py     # Task management
+    │   │   └── settings.py  # Settings page
+    │   ├── components/      # Reusable UI components
+    │   │   ├── __init__.py
+    │   │   ├── task_card.py
+    │   │   ├── time_block_editor.py
+    │   │   ├── energy_meter.py
+    │   │   └── sync_status.py
+    │   └── styles/          # Custom styles
+    │       └── custom.css
+    │
+    └── utils/               # Utilities
+        ├── __init__.py
+        ├── config.py        # ✅ Configuration management (ADHD-1)
+        ├── logger.py        # ✅ Logging setup (ADHD-1)
+        ├── time_utils.py    # Time utilities
+        ├── validation.py    # Validation helpers
+        └── prompts/         # LLM prompts
+            ├── planning_prompts.py
+            ├── scheduling_prompts.py
+            └── suggestion_prompts.py
 ```
+
+**Current Implementation Status**:
+- ✅ = Implemented
+- 🚧 = In progress
+- 📋 = Planned
+
+As of ADHD-1, only `utils/config.py` and `utils/logger.py` are implemented.
 
 ## Tests Structure (`tests/`)
 
