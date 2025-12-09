@@ -44,7 +44,7 @@ Business logic and service layer.
 | ADHD-7 | LLM Service & Provider Factory | 3h | ✅ Complete |
 | ADHD-8 | Task Service | 3h | ✅ Complete |
 | ADHD-9 | Calendar Service | 3h | ✅ Complete |
-| ADHD-10 | Time Estimation Service | 2h | 📋 Not Started |
+| ADHD-10 | Time Estimation Service | 2h | ✅ Complete |
 
 **Total: ~13 hours** (4 sessions)
 
@@ -208,12 +208,12 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 
 Update this section as you complete stories:
 
-- **Completed Stories**: 9/33 ✅
+- **Completed Stories**: 10/33 ✅
 - **Story Cards Created**: ADHD-11 to ADHD-16 (Epic 3)
-- **Current Sprint**: Epic 2 - Core Services (ADHD-10 next)
-- **Current Story**: ADHD-9 (Complete) / ADHD-10 (Next)
-- **Hours Invested**: ~24 hours
-- **Estimated Remaining**: ~65 hours
+- **Current Sprint**: Epic 2 - Core Services (ADHD-10 complete, ADHD-11 next)
+- **Current Story**: ADHD-10 (Complete) / ADHD-11 (Next)
+- **Hours Invested**: ~26 hours
+- **Estimated Remaining**: ~63 hours
 
 ## Getting Help
 
@@ -235,6 +235,7 @@ If you get stuck on a story:
 7. ✅ ~~Read [ADHD-7: LLM Service & Provider Factory](epic-2-core-services/ADHD-7-llm-service-provider-factory.md)~~ - **COMPLETE**
 8. ✅ ~~Read [ADHD-8: Task Service](epic-2-core-services/ADHD-8-task-service.md)~~ - **COMPLETE**
 9. ✅ ~~Read [ADHD-9: Calendar Service](epic-2-core-services/ADHD-9-calendar-service.md)~~ - **COMPLETE**
-10. 📍 Read [ADHD-10: Time Estimation Service](epic-2-core-services/ADHD-10-time-estimation-service.md)
+10. ✅ ~~Read [ADHD-10: Time Estimation Service](epic-2-core-services/ADHD-10-time-estimation-service.md)~~ - **COMPLETE**
+11. 📍 Read [ADHD-11: LangGraph State & Base Agent](epic-3-agents/ADHD-11-langgraph-state-base-agent.md)
 
 Good luck! Remember: progress over perfection. 🚀
