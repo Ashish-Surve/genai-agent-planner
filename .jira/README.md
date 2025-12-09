@@ -53,12 +53,12 @@ AI agent system with LangGraph.
 
 | Story | Title | Time | Status |
 |-------|-------|------|--------|
-| ADHD-11 | LangGraph State & Base Agent | 3h | 📋 Not Started |
-| ADHD-12 | Supervisor Agent | 3h | 📋 Not Started |
-| ADHD-13 | Planning Agent | 3h | 📋 Not Started |
-| ADHD-14 | Scheduling Agent | 4h | 📋 Not Started |
-| ADHD-15 | Suggestion Agent | 2h | 📋 Not Started |
-| ADHD-16 | Graph Builder & Integration | 3h | 📋 Not Started |
+| ADHD-11 | LangGraph State & Base Agent | 3h | ✅ Complete |
+| ADHD-12 | Supervisor Agent | 3h | ✅ Complete |
+| ADHD-13 | Planning Agent | 3h | ✅ Complete |
+| ADHD-14 | Scheduling Agent | 4h | ✅ Complete |
+| ADHD-15 | Suggestion Agent | 2h | ✅ Complete |
+| ADHD-16 | Graph Builder & Integration | 3h | ✅ Complete |
 
 **Total: ~18 hours** (5 sessions)
 
@@ -208,12 +208,12 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 
 Update this section as you complete stories:
 
-- **Completed Stories**: 10/33 ✅
-- **Story Cards Created**: ADHD-11 to ADHD-16 (Epic 3)
-- **Current Sprint**: Epic 2 - Core Services (ADHD-10 complete, ADHD-11 next)
-- **Current Story**: ADHD-10 (Complete) / ADHD-11 (Next)
-- **Hours Invested**: ~26 hours
-- **Estimated Remaining**: ~63 hours
+- **Completed Stories**: 16/33 ✅
+- **Story Cards Created**: All stories through ADHD-29
+- **Current Sprint**: Epic 3 - LangGraph Agents (Complete) → Epic 4 - Streamlit UI (Next)
+- **Current Story**: ADHD-16 (Complete) / ADHD-17 (Next)
+- **Hours Invested**: ~44 hours
+- **Estimated Remaining**: ~45 hours
 
 ## Getting Help
 
@@ -236,6 +236,12 @@ If you get stuck on a story:
 8. ✅ ~~Read [ADHD-8: Task Service](epic-2-core-services/ADHD-8-task-service.md)~~ - **COMPLETE**
 9. ✅ ~~Read [ADHD-9: Calendar Service](epic-2-core-services/ADHD-9-calendar-service.md)~~ - **COMPLETE**
 10. ✅ ~~Read [ADHD-10: Time Estimation Service](epic-2-core-services/ADHD-10-time-estimation-service.md)~~ - **COMPLETE**
-11. 📍 Read [ADHD-11: LangGraph State & Base Agent](epic-3-agents/ADHD-11-langgraph-state-base-agent.md)
+11. ✅ ~~Read [ADHD-11: LangGraph State & Base Agent](epic-3-langgraph-agents/ADHD-11-langgraph-state-base-agent.md)~~ - **COMPLETE**
+12. ✅ ~~Read [ADHD-12: Supervisor Agent](epic-3-langgraph-agents/ADHD-12-supervisor-agent.md)~~ - **COMPLETE**
+13. ✅ ~~Read [ADHD-13: Planning Agent](epic-3-langgraph-agents/ADHD-13-planning-agent.md)~~ - **COMPLETE**
+14. ✅ ~~Read [ADHD-14: Scheduling Agent](epic-3-langgraph-agents/ADHD-14-scheduling-agent.md)~~ - **COMPLETE**
+15. ✅ ~~Read [ADHD-15: Suggestion Agent](epic-3-langgraph-agents/ADHD-15-suggestion-agent.md)~~ - **COMPLETE**
+16. ✅ ~~Read [ADHD-16: Graph Builder & Integration](epic-3-langgraph-agents/ADHD-16-graph-builder-integration.md)~~ - **COMPLETE**
+17. 📍 Read [ADHD-17: Streamlit App Structure](epic-4-streamlit-ui/ADHD-17-streamlit-app-structure.md)
 
 Good luck! Remember: progress over perfection. 🚀
