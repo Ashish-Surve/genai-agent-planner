@@ -209,9 +209,9 @@ ADHD-6 (Config) → ADHD-7 (LLM Service) ─────────────
 Update this section as you complete stories:
 
 - **Completed Stories**: 10/33 ✅
-- **Story Cards Created**: ADHD-11 to ADHD-16 (Epic 3)
-- **Current Sprint**: Epic 2 - Core Services (ADHD-10 complete, ADHD-11 next)
-- **Current Story**: ADHD-10 (Complete) / ADHD-11 (Next)
+- **Story Cards Created**: ADHD-11 to ADHD-21 (Epic 3 & Epic 4)
+- **Current Sprint**: Epic 3 - LangGraph Agents
+- **Current Story**: ADHD-11 (Next)
 - **Hours Invested**: ~26 hours
 - **Estimated Remaining**: ~63 hours
 
@@ -236,6 +236,13 @@ If you get stuck on a story:
 8. ✅ ~~Read [ADHD-8: Task Service](epic-2-core-services/ADHD-8-task-service.md)~~ - **COMPLETE**
 9. ✅ ~~Read [ADHD-9: Calendar Service](epic-2-core-services/ADHD-9-calendar-service.md)~~ - **COMPLETE**
 10. ✅ ~~Read [ADHD-10: Time Estimation Service](epic-2-core-services/ADHD-10-time-estimation-service.md)~~ - **COMPLETE**
-11. 📍 Read [ADHD-11: LangGraph State & Base Agent](epic-3-agents/ADHD-11-langgraph-state-base-agent.md)
+11. 📍 Read [ADHD-11: LangGraph State & Base Agent](epic-3-langgraph-agents/ADHD-11-langgraph-state-base-agent.md)
+
+### Epic 4 Story Cards (Ready)
+- [ADHD-17: Streamlit App Structure](epic-4-streamlit-ui/ADHD-17-streamlit-app-structure.md)
+- [ADHD-18: Chat Page & Components](epic-4-streamlit-ui/ADHD-18-chat-page-components.md)
+- [ADHD-19: Tasks Page & Components](epic-4-streamlit-ui/ADHD-19-tasks-page-components.md)
+- [ADHD-20: Calendar View](epic-4-streamlit-ui/ADHD-20-calendar-view.md)
+- [ADHD-21: Settings Page](epic-4-streamlit-ui/ADHD-21-settings-page.md)
 
 Good luck! Remember: progress over perfection. 🚀
