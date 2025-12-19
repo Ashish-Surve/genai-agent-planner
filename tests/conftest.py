@@ -36,7 +36,7 @@ def mock_settings(monkeypatch, test_data_dir):
 @pytest.fixture
 def test_db_session(mock_settings, monkeypatch):
     """Create test database session."""
-    from src.database.connection import DatabaseManager
+    from adhd_planner.database.connection import DatabaseManager
 
     # Create a fresh database manager for the test
     db = DatabaseManager()

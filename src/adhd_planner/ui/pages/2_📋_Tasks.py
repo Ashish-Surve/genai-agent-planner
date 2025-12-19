@@ -20,12 +20,10 @@ def get_task_service():
     if "task_service" not in st.session_state:
         try:
             from adhd_planner.database.connection import get_session
-            from adhd_planner.repositories.task_repository import TaskRepository
             from adhd_planner.services.task_service import TaskService
 
             session = get_session()
-            repo = TaskRepository(session)
-            st.session_state["task_service"] = TaskService(repo)
+            st.session_state["task_service"] = TaskService(session)
         except Exception as e:
             logger.warning(f"Could not initialize task service: {e}")
             st.session_state["task_service"] = None

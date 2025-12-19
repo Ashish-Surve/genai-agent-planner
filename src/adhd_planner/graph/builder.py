@@ -1,9 +1,9 @@
 """Graph builder for LangGraph workflow."""
 
-from langgraph.graph import StateGraph
+from langgraph.graph import END, StateGraph
 
+from adhd_planner.graph.edges import route_to_agent
 from adhd_planner.graph.state import AgentState
-from adhd_planner.graph.edges import route_to_agent, route_after_specialist
 from adhd_planner.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -36,10 +36,10 @@ class GraphBuilder:
     def build_graph(self):
         """Build the LangGraph."""
         # Lazy import to avoid circular imports
-        from adhd_planner.agents.supervisor import SupervisorAgent
         from adhd_planner.agents.planning_agent import PlanningAgent
         from adhd_planner.agents.scheduling_agent import SchedulingAgent
         from adhd_planner.agents.suggestion_agent import SuggestionAgent
+        from adhd_planner.agents.supervisor import SupervisorAgent
         from adhd_planner.graph.nodes import create_node_functions
 
         # Create agent instances
@@ -79,20 +79,17 @@ class GraphBuilder:
                 "planning_agent": "planning_agent",
                 "scheduling_agent": "scheduling_agent",
                 "suggestion_agent": "suggestion_agent",
-                "END": "__end__",
-            }
+                "END": END,
+            },
         )
 
         # Add edges from specialist agents to END
-        self.graph.add_edge("planning_agent", "__end__")
-        self.graph.add_edge("scheduling_agent", "__end__")
-        self.graph.add_edge("suggestion_agent", "__end__")
+        self.graph.add_edge("planning_agent", END)
+        self.graph.add_edge("scheduling_agent", END)
+        self.graph.add_edge("suggestion_agent", END)
 
         # Set entry point
         self.graph.set_entry_point("supervisor")
-
-        # Set finish point
-        self.graph.set_finish_point("END")
 
         # Compile graph
         self.compiled_graph = self.graph.compile()

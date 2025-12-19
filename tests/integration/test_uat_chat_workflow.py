@@ -7,14 +7,14 @@ This test simulates real user interactions through the chat interface:
 4. System deletes the task
 """
 
-import pytest
 from datetime import datetime, timedelta
 
+import pytest
+
 from adhd_planner.core.chat_handler import ChatHandler
-from adhd_planner.graph.state_utils import StateManager
+from adhd_planner.database.connection import DatabaseManager
 from adhd_planner.services.llm_service import LLMService
-from src.database.connection import DatabaseManager
-from src.services.task_service import TaskService
+from adhd_planner.services.task_service import TaskService
 
 
 @pytest.fixture
@@ -123,10 +123,7 @@ class TestChatUATWorkflow:
         assert response is not None
         assert len(response) > 0
         # Response should be relevant to adding tasks
-        assert any(
-            keyword in response.lower()
-            for keyword in ["task", "add", "help", "would"]
-        )
+        assert any(keyword in response.lower() for keyword in ["task", "add", "help", "would"])
 
     def test_chat_response_to_plan_day_request(self, chat_handler):
         """UAT: Chat handler responds to plan day request."""

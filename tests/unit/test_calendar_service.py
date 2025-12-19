@@ -1,10 +1,12 @@
 """Test calendar service."""
 
+from datetime import date, datetime
+
 import pytest
-from datetime import datetime, date, timedelta
-from src.services.calendar_service import CalendarService, ScheduleSlot
-from src.models.enums import BlockType
-from src.adhd_planner.utils.errors import UserFacingError
+
+from adhd_planner.models.enums import BlockType
+from adhd_planner.services.calendar_service import CalendarService
+from adhd_planner.utils.errors import UserFacingError
 
 
 @pytest.fixture

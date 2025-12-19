@@ -43,6 +43,9 @@ class SettingsManager:
         "show_energy_indicators": True,
     }
 
+    # Settings that are read-only (loaded from environment variables)
+    READ_ONLY_SETTINGS = {"llm_provider", "llm_model", "gemini_api_key", "anthropic_api_key"}
+
     def __init__(self, settings_path: Path | None = None):
         """
         Initialize settings manager.
@@ -96,7 +99,14 @@ class SettingsManager:
         return self._settings.get(key, default)
 
     def set(self, key: str, value: Any) -> None:
-        """Set a setting value."""
+        """
+        Set a setting value.
+
+        Read-only settings cannot be changed.
+        """
+        if key in self.READ_ONLY_SETTINGS:
+            logger.warning(f"Cannot set read-only setting: {key}")
+            return
         self._settings[key] = value
 
     def get_all(self) -> dict[str, Any]:
@@ -104,8 +114,13 @@ class SettingsManager:
         return self._settings.copy()
 
     def update(self, settings: dict[str, Any]) -> None:
-        """Update multiple settings at once."""
-        self._settings.update(settings)
+        """
+        Update multiple settings at once.
+
+        Read-only settings are ignored during update.
+        """
+        filtered_settings = {k: v for k, v in settings.items() if k not in self.READ_ONLY_SETTINGS}
+        self._settings.update(filtered_settings)
 
     def reset_to_defaults(self) -> None:
         """Reset all settings to defaults."""

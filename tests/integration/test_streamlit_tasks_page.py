@@ -7,10 +7,9 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from adhd_planner.utils.validation import ValidationError
+from adhd_planner.services.task_service import TaskService
 from adhd_planner.utils.errors import UserFacingError
-from src.models.task import Priority, TaskStatus
-from src.services.task_service import TaskService
+from adhd_planner.utils.validation import ValidationError
 
 
 @pytest.fixture

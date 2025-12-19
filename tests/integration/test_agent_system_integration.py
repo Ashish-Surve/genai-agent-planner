@@ -5,20 +5,19 @@ and database interactions. Tests focus on the core functionality
 that doesn't depend on external LLM providers.
 """
 
-import json
-import pytest
 from datetime import datetime, timedelta
+
+import pytest
 
 from adhd_planner.agents.planning_agent import PlanningAgent
 from adhd_planner.agents.scheduling_agent import SchedulingAgent
 from adhd_planner.agents.suggestion_agent import SuggestionAgent
 from adhd_planner.agents.supervisor import SupervisorAgent
+from adhd_planner.database.connection import DatabaseManager
 from adhd_planner.graph.state_utils import StateManager
+from adhd_planner.services.calendar_service import CalendarService
 from adhd_planner.services.llm_service import LLMService
-from models.enums import Priority, EnergyLevel
-from src.database.connection import DatabaseManager
-from src.services.task_service import TaskService
-from src.services.calendar_service import CalendarService
+from adhd_planner.services.task_service import TaskService
 
 
 @pytest.fixture
@@ -56,10 +55,7 @@ def calendar_service(integration_db_session):
 @pytest.fixture
 def llm_service():
     """Create LLM service using gemini provider."""
-    return LLMService(
-        provider_name="gemini",
-        temperature=0.3
-    )
+    return LLMService(provider_name="gemini", temperature=0.3)
 
 
 @pytest.fixture
@@ -406,17 +402,11 @@ class TestAgentErrorHandling:
         """Test task service validates duration."""
         # Negative duration should fail
         with pytest.raises(Exception):
-            task_service.create_task(
-                title="Test",
-                estimated_duration_minutes=-30
-            )
+            task_service.create_task(title="Test", estimated_duration_minutes=-30)
 
         # Zero duration should fail
         with pytest.raises(Exception):
-            task_service.create_task(
-                title="Test",
-                estimated_duration_minutes=0
-            )
+            task_service.create_task(title="Test", estimated_duration_minutes=0)
 
     def test_calendar_service_time_validation(self, calendar_service):
         """Test calendar service validates times."""
@@ -551,8 +541,7 @@ class TestRealWorldScenarios:
 
         # Get blocks for date range
         blocks = calendar_service.get_blocks_for_date_range(
-            start_date=base_date.date(),
-            end_date=base_date.date() + timedelta(days=2)
+            start_date=base_date.date(), end_date=base_date.date() + timedelta(days=2)
         )
         assert len(blocks) >= 21  # 3 days * 7 work hours
 

@@ -8,11 +8,10 @@ from datetime import datetime, time, timedelta
 import pytest
 
 from adhd_planner.core.chat_handler import ChatHandler
-from adhd_planner.core.settings_manager import SettingsManager
+from adhd_planner.models.time_block import BlockType
+from adhd_planner.services.calendar_service import CalendarService
+from adhd_planner.services.task_service import TaskService
 from adhd_planner.utils.errors import UserFacingError
-from src.models.time_block import BlockType, EnergyLevel
-from src.services.calendar_service import CalendarService
-from src.services.task_service import TaskService
 
 
 @pytest.fixture

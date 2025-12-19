@@ -1,11 +1,12 @@
 """Test task service."""
 
-import pytest
 from datetime import datetime, timedelta
 
-from src.services.task_service import TaskService
-from src.adhd_planner.utils.validation import ValidationError
-from src.adhd_planner.utils.errors import UserFacingError
+import pytest
+
+from adhd_planner.services.task_service import TaskService
+from adhd_planner.utils.errors import UserFacingError
+from adhd_planner.utils.validation import ValidationError
 
 
 @pytest.fixture
@@ -24,7 +25,7 @@ class TestCreateTask:
             description="Test description",
             estimated_duration_minutes=60,
             energy_level="HIGH",
-            priority="URGENT"
+            priority="URGENT",
         )
 
         assert task.id is not None
@@ -103,10 +104,7 @@ class TestTaskDependencies:
     def test_create_task_with_dependencies(self, task_service):
         """Test creating task with dependencies."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         assert len(task2.dependencies) == 1
         assert task2.dependencies[0].id == task1.id
@@ -114,10 +112,7 @@ class TestTaskDependencies:
     def test_create_task_with_nonexistent_dependency(self, task_service):
         """Test that nonexistent dependency is rejected."""
         with pytest.raises(UserFacingError, match="does not exist"):
-            task_service.create_task(
-                title="Test",
-                dependency_ids=["nonexistent-id"]
-            )
+            task_service.create_task(title="Test", dependency_ids=["nonexistent-id"])
 
     def test_dependencies_satisfied_no_deps(self, task_service):
         """Test that task with no dependencies is ready."""
@@ -130,10 +125,7 @@ class TestTaskDependencies:
     def test_dependencies_satisfied_incomplete_deps(self, task_service):
         """Test that task with incomplete dependencies is not ready."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         ready_tasks = task_service.get_tasks_ready_to_start()
 
@@ -143,10 +135,7 @@ class TestTaskDependencies:
     def test_dependencies_satisfied_completed_deps(self, task_service):
         """Test that task with completed dependencies is ready."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         task_service.complete_task(task1.id)
 
@@ -157,10 +146,7 @@ class TestTaskDependencies:
     def test_cannot_start_task_with_incomplete_dependencies(self, task_service):
         """Test that task with incomplete dependencies cannot be started."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         with pytest.raises(UserFacingError, match="dependencies"):
             task_service.start_task(task2.id)
@@ -168,10 +154,7 @@ class TestTaskDependencies:
     def test_can_start_task_with_completed_dependencies(self, task_service):
         """Test that task can be started once dependencies are completed."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         task_service.complete_task(task1.id)
         started = task_service.start_task(task2.id)
@@ -310,10 +293,7 @@ class TestDeleteTask:
     def test_cannot_delete_task_with_dependents(self, task_service):
         """Test that tasks with dependents cannot be deleted."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         with pytest.raises(UserFacingError, match="dependents"):
             task_service.delete_task(task1.id)
@@ -321,10 +301,7 @@ class TestDeleteTask:
     def test_can_delete_task_after_dependents_removed(self, task_service):
         """Test that task can be deleted after removing dependents."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(
-            title="Task 2",
-            dependency_ids=[task1.id]
-        )
+        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         task_service.delete_task(task2.id)
         task_service.delete_task(task1.id)

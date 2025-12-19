@@ -7,8 +7,8 @@ from datetime import datetime, time, timedelta
 
 import pytest
 
-from src.models.time_block import BlockType, EnergyLevel
-from src.services.calendar_service import CalendarService
+from adhd_planner.models.time_block import BlockType, EnergyLevel
+from adhd_planner.services.calendar_service import CalendarService
 from adhd_planner.utils.errors import UserFacingError
 
 
@@ -33,7 +33,8 @@ def sample_time_block_data():
 @pytest.fixture
 def sample_task_id(test_db_session):
     """Create a real task and return its ID for foreign key constraints."""
-    from src.services.task_service import TaskService
+    from adhd_planner.services.task_service import TaskService
+
     task_service = TaskService(test_db_session)
     task = task_service.create_task(
         title="Calendar Test Task",

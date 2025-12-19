@@ -1,13 +1,11 @@
 """Test time estimation service."""
 
-import pytest
-from unittest.mock import Mock
 from datetime import datetime
+from unittest.mock import Mock
 
-from src.services.time_estimation_service import (
-    TimeEstimationService,
-    TimeEstimate
-)
+import pytest
+
+from adhd_planner.services.time_estimation_service import TimeEstimate, TimeEstimationService
 
 
 @pytest.fixture
@@ -27,10 +25,7 @@ def mock_llm_service():
 def test_time_estimate_repr(estimation_service):
     """Test TimeEstimate string representation."""
     estimate = TimeEstimate(
-        estimated_minutes=30,
-        confidence=0.8,
-        method="default",
-        buffer_minutes=10
+        estimated_minutes=30, confidence=0.8, method="default", buffer_minutes=10
     )
 
     repr_str = repr(estimate)
@@ -110,9 +105,7 @@ def test_estimate_duration_with_llm(estimation_service, mock_llm_service):
     estimation_service.llm_service = mock_llm_service
 
     estimate = estimation_service.estimate_duration(
-        title="Write report",
-        description="Monthly status report",
-        energy_level="HIGH"
+        title="Write report", description="Monthly status report", energy_level="HIGH"
     )
 
     assert estimate.estimated_minutes == 45
@@ -124,9 +117,7 @@ def test_estimate_duration_with_llm(estimation_service, mock_llm_service):
 def test_estimate_duration_fallback_to_default(estimation_service):
     """Test fallback to default when no LLM."""
     estimate = estimation_service.estimate_duration(
-        title="New task",
-        energy_level="MEDIUM",
-        use_llm=False
+        title="New task", energy_level="MEDIUM", use_llm=False
     )
 
     assert estimate.method == "default"
@@ -138,10 +129,7 @@ def test_estimate_duration_llm_parsing_failure(estimation_service, mock_llm_serv
     mock_llm_service.generate.return_value = "This is some text with no duration"
     estimation_service.llm_service = mock_llm_service
 
-    estimate = estimation_service.estimate_duration(
-        title="Task",
-        energy_level="MEDIUM"
-    )
+    estimate = estimation_service.estimate_duration(title="Task", energy_level="MEDIUM")
 
     # Should fall back to default
     assert estimate.method == "default"
@@ -158,12 +146,9 @@ def test_calculate_estimation_accuracy_no_data(estimation_service):
     assert accuracy["overestimation_rate"] == 0
 
 
-def test_calculate_estimation_accuracy_with_data(
-    estimation_service,
-    test_db_session
-):
+def test_calculate_estimation_accuracy_with_data(estimation_service, test_db_session):
     """Test accuracy calculation with completed tasks."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -176,7 +161,7 @@ def test_calculate_estimation_accuracy_with_data(
             "estimated_energy_level": "MEDIUM",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
@@ -195,12 +180,9 @@ def test_get_user_estimation_pattern_insufficient_data(estimation_service):
     assert "Not enough data" in pattern
 
 
-def test_get_user_estimation_pattern_underestimate(
-    estimation_service,
-    test_db_session
-):
+def test_get_user_estimation_pattern_underestimate(estimation_service, test_db_session):
     """Test user pattern analysis with underestimation."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -213,7 +195,7 @@ def test_get_user_estimation_pattern_underestimate(
             "estimated_energy_level": "MEDIUM",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
@@ -223,12 +205,9 @@ def test_get_user_estimation_pattern_underestimate(
     assert "buffer" in pattern.lower()
 
 
-def test_get_user_estimation_pattern_overestimate(
-    estimation_service,
-    test_db_session
-):
+def test_get_user_estimation_pattern_overestimate(estimation_service, test_db_session):
     """Test user pattern analysis with overestimation."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -241,7 +220,7 @@ def test_get_user_estimation_pattern_overestimate(
             "estimated_energy_level": "MEDIUM",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
@@ -253,7 +232,7 @@ def test_get_user_estimation_pattern_overestimate(
 
 def test_find_similar_tasks(estimation_service, test_db_session):
     """Test finding similar tasks."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -266,15 +245,13 @@ def test_find_similar_tasks(estimation_service, test_db_session):
         "priority": "HIGH",
         "status": "COMPLETED",
         "completed_at": datetime.utcnow(),
-        "context_category": "writing"
+        "context_category": "writing",
     }
     repo.create(task_data)
 
     # Find similar
     similar = estimation_service._find_similar_tasks(
-        title="Write documentation",
-        context_category="writing",
-        energy_level="HIGH"
+        title="Write documentation", context_category="writing", energy_level="HIGH"
     )
 
     assert len(similar) > 0
@@ -283,7 +260,7 @@ def test_find_similar_tasks(estimation_service, test_db_session):
 
 def test_find_similar_tasks_category_filter(estimation_service, test_db_session):
     """Test similar task filtering by category."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -296,7 +273,7 @@ def test_find_similar_tasks_category_filter(estimation_service, test_db_session)
         "priority": "MEDIUM",
         "status": "COMPLETED",
         "completed_at": datetime.utcnow(),
-        "context_category": "writing"
+        "context_category": "writing",
     }
     repo.create(writing_task)
 
@@ -308,15 +285,13 @@ def test_find_similar_tasks_category_filter(estimation_service, test_db_session)
         "priority": "MEDIUM",
         "status": "COMPLETED",
         "completed_at": datetime.utcnow(),
-        "context_category": "coding"
+        "context_category": "coding",
     }
     repo.create(coding_task)
 
     # Search for similar writing tasks
     similar = estimation_service._find_similar_tasks(
-        title="Write blog post",
-        context_category="writing",
-        energy_level="MEDIUM"
+        title="Write blog post", context_category="writing", energy_level="MEDIUM"
     )
 
     # Should find only writing tasks
@@ -325,7 +300,7 @@ def test_find_similar_tasks_category_filter(estimation_service, test_db_session)
 
 def test_estimate_from_history(estimation_service, test_db_session):
     """Test historical estimation."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -338,15 +313,13 @@ def test_estimate_from_history(estimation_service, test_db_session):
             "estimated_energy_level": "HIGH",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
     # Estimate based on history
     estimate = estimation_service.estimate_duration(
-        title="Write guide",
-        energy_level="HIGH",
-        use_llm=False
+        title="Write guide", energy_level="HIGH", use_llm=False
     )
 
     # Should use historical data
@@ -357,7 +330,7 @@ def test_estimate_from_history(estimation_service, test_db_session):
 
 def test_confidence_increases_with_more_data(estimation_service, test_db_session):
     """Test that confidence increases with more similar tasks."""
-    from src.repositories.task_repository import TaskRepository
+    from adhd_planner.repositories.task_repository import TaskRepository
 
     repo = TaskRepository(test_db_session)
 
@@ -370,13 +343,11 @@ def test_confidence_increases_with_more_data(estimation_service, test_db_session
             "estimated_energy_level": "HIGH",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
-    estimate1 = estimation_service._estimate_from_history(
-        "Write test", None, "HIGH"
-    )
+    estimate1 = estimation_service._estimate_from_history("Write test", None, "HIGH")
     conf1 = estimate1.confidence if estimate1 else 0
 
     # Add more similar tasks
@@ -388,13 +359,11 @@ def test_confidence_increases_with_more_data(estimation_service, test_db_session
             "estimated_energy_level": "HIGH",
             "priority": "MEDIUM",
             "status": "COMPLETED",
-            "completed_at": datetime.utcnow()
+            "completed_at": datetime.utcnow(),
         }
         repo.create(task_data)
 
-    estimate2 = estimation_service._estimate_from_history(
-        "Write test", None, "HIGH"
-    )
+    estimate2 = estimation_service._estimate_from_history("Write test", None, "HIGH")
     conf2 = estimate2.confidence if estimate2 else 0
 
     # More tasks = higher confidence (up to 0.8 max)

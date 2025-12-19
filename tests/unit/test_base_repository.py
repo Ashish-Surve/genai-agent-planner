@@ -1,8 +1,9 @@
 """Test base repository."""
 
 import pytest
-from src.repositories.base_repository import BaseRepository
-from src.database.schema import TaskModel
+
+from adhd_planner.database.schema import TaskModel
+from adhd_planner.repositories.base_repository import BaseRepository
 
 
 @pytest.fixture
@@ -17,7 +18,7 @@ def test_create(task_repository):
         "title": "Test task",
         "estimated_duration_minutes": 30,
         "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
+        "priority": "HIGH",
     }
 
     task = task_repository.create(data)
@@ -34,7 +35,7 @@ def test_get_by_id(task_repository):
         "title": "Test task",
         "estimated_duration_minutes": 30,
         "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
+        "priority": "HIGH",
     }
     task = task_repository.create(data)
 
@@ -56,12 +57,14 @@ def test_get_all(task_repository):
     """Test getting all entities."""
     # Create multiple tasks
     for i in range(5):
-        task_repository.create({
-            "title": f"Task {i}",
-            "estimated_duration_minutes": 30,
-            "estimated_energy_level": "MEDIUM",
-            "priority": "HIGH"
-        })
+        task_repository.create(
+            {
+                "title": f"Task {i}",
+                "estimated_duration_minutes": 30,
+                "estimated_energy_level": "MEDIUM",
+                "priority": "HIGH",
+            }
+        )
 
     # Get all
     tasks = task_repository.get_all()
@@ -72,12 +75,14 @@ def test_get_all_with_pagination(task_repository):
     """Test pagination."""
     # Create tasks
     for i in range(10):
-        task_repository.create({
-            "title": f"Task {i}",
-            "estimated_duration_minutes": 30,
-            "estimated_energy_level": "MEDIUM",
-            "priority": "HIGH"
-        })
+        task_repository.create(
+            {
+                "title": f"Task {i}",
+                "estimated_duration_minutes": 30,
+                "estimated_energy_level": "MEDIUM",
+                "priority": "HIGH",
+            }
+        )
 
     # Get with limit
     tasks = task_repository.get_all(limit=5)
@@ -91,18 +96,19 @@ def test_get_all_with_pagination(task_repository):
 def test_update(task_repository):
     """Test updating an entity."""
     # Create task
-    task = task_repository.create({
-        "title": "Original title",
-        "estimated_duration_minutes": 30,
-        "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
-    })
+    task = task_repository.create(
+        {
+            "title": "Original title",
+            "estimated_duration_minutes": 30,
+            "estimated_energy_level": "MEDIUM",
+            "priority": "HIGH",
+        }
+    )
 
     # Update
-    updated = task_repository.update(task.id, {
-        "title": "Updated title",
-        "estimated_duration_minutes": 45
-    })
+    updated = task_repository.update(
+        task.id, {"title": "Updated title", "estimated_duration_minutes": 45}
+    )
 
     assert updated.title == "Updated title"
     assert updated.estimated_duration_minutes == 45
@@ -117,12 +123,14 @@ def test_update_not_found(task_repository):
 def test_delete(task_repository):
     """Test deleting an entity."""
     # Create task
-    task = task_repository.create({
-        "title": "Test task",
-        "estimated_duration_minutes": 30,
-        "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
-    })
+    task = task_repository.create(
+        {
+            "title": "Test task",
+            "estimated_duration_minutes": 30,
+            "estimated_energy_level": "MEDIUM",
+            "priority": "HIGH",
+        }
+    )
 
     # Delete
     success = task_repository.delete(task.id)
@@ -142,18 +150,22 @@ def test_delete_not_found(task_repository):
 def test_find_by_filters(task_repository):
     """Test finding entities by filters."""
     # Create tasks with different priorities
-    task_repository.create({
-        "title": "High priority task",
-        "estimated_duration_minutes": 30,
-        "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
-    })
-    task_repository.create({
-        "title": "Low priority task",
-        "estimated_duration_minutes": 30,
-        "estimated_energy_level": "MEDIUM",
-        "priority": "LOW"
-    })
+    task_repository.create(
+        {
+            "title": "High priority task",
+            "estimated_duration_minutes": 30,
+            "estimated_energy_level": "MEDIUM",
+            "priority": "HIGH",
+        }
+    )
+    task_repository.create(
+        {
+            "title": "Low priority task",
+            "estimated_duration_minutes": 30,
+            "estimated_energy_level": "MEDIUM",
+            "priority": "LOW",
+        }
+    )
 
     # Find by filter
     high_priority = task_repository.find_by_filters({"priority": "HIGH"})
@@ -165,12 +177,14 @@ def test_count(task_repository):
     """Test counting entities."""
     # Create tasks
     for i in range(7):
-        task_repository.create({
-            "title": f"Task {i}",
-            "estimated_duration_minutes": 30,
-            "estimated_energy_level": "MEDIUM",
-            "priority": "HIGH"
-        })
+        task_repository.create(
+            {
+                "title": f"Task {i}",
+                "estimated_duration_minutes": 30,
+                "estimated_energy_level": "MEDIUM",
+                "priority": "HIGH",
+            }
+        )
 
     # Count all
     count = task_repository.count()
@@ -184,12 +198,14 @@ def test_count(task_repository):
 def test_exists(task_repository):
     """Test checking if entity exists."""
     # Create task
-    task = task_repository.create({
-        "title": "Test task",
-        "estimated_duration_minutes": 30,
-        "estimated_energy_level": "MEDIUM",
-        "priority": "HIGH"
-    })
+    task = task_repository.create(
+        {
+            "title": "Test task",
+            "estimated_duration_minutes": 30,
+            "estimated_energy_level": "MEDIUM",
+            "priority": "HIGH",
+        }
+    )
 
     # Check exists
     assert task_repository.exists(task.id) is True
@@ -203,7 +219,7 @@ def test_bulk_create(task_repository):
             "title": f"Task {i}",
             "estimated_duration_minutes": 30,
             "estimated_energy_level": "MEDIUM",
-            "priority": "HIGH"
+            "priority": "HIGH",
         }
         for i in range(5)
     ]
@@ -217,15 +233,17 @@ def test_bulk_create(task_repository):
 def test_bulk_delete(task_repository):
     """Test bulk deletion."""
     # Create tasks
-    tasks = task_repository.bulk_create([
-        {
-            "title": f"Task {i}",
-            "estimated_duration_minutes": 30,
-            "estimated_energy_level": "MEDIUM",
-            "priority": "HIGH"
-        }
-        for i in range(5)
-    ])
+    tasks = task_repository.bulk_create(
+        [
+            {
+                "title": f"Task {i}",
+                "estimated_duration_minutes": 30,
+                "estimated_energy_level": "MEDIUM",
+                "priority": "HIGH",
+            }
+            for i in range(5)
+        ]
+    )
 
     # Get IDs
     task_ids = [task.id for task in tasks]
