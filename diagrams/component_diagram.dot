@@ -1,0 +1,68 @@
+// ADHD-Planner Component Diagram
+digraph ADHD_Planner_Component_Diagram {
+	nodesep=0.8 rankdir=TB ranksep=1.2 splines=spline
+	node [fontname=Helvetica fontsize=11 shape=component]
+	edge [fontname=Helvetica fontsize=9]
+	fontname="Helvetica-Bold" fontsize=16 label="ADHD-Planner - Component Architecture" labelloc=t
+	subgraph cluster_presentation {
+		fillcolor="#E6F3FF" label="Presentation Layer" style=filled
+		StreamlitApp [label="Streamlit App" shape=component]
+		ChatPage [label="Chat Page" shape=component]
+		TasksPage [label="Tasks Page" shape=component]
+		CalendarPage [label="Calendar Page" shape=component]
+		SettingsPage [label="Settings Page" shape=component]
+	}
+	subgraph cluster_core {
+		fillcolor="#FFF3E6" label="Application Core" style=filled
+		ChatHandler [label=ChatHandler shape=component]
+		SessionManager [label=SessionManager shape=component]
+		GraphBuilder [label="GraphBuilder\n(LangGraph)" shape=component]
+	}
+	subgraph cluster_agents {
+		fillcolor="#F3E6FF" label="Multi-Agent System" style=filled
+		Supervisor [label=SupervisorAgent shape=component]
+		Planning [label=PlanningAgent shape=component]
+		Scheduling [label=SchedulingAgent shape=component]
+		Suggestion [label=SuggestionAgent shape=component]
+	}
+	subgraph cluster_services {
+		fillcolor="#E6FFE6" label="Service Layer" style=filled
+		TaskSvc [label=TaskService shape=component]
+		CalendarSvc [label=CalendarService shape=component]
+		LLMSvc [label=LLMService shape=component]
+		SettingsMgr [label=SettingsManager shape=component]
+	}
+	subgraph cluster_data {
+		fillcolor="#FFE6E6" label="Data Access Layer" style=filled
+		TaskRepo [label=TaskRepository shape=component]
+		TimeBlockRepo [label=TimeBlockRepository shape=component]
+		DBManager [label=DatabaseManager shape=component]
+	}
+	subgraph cluster_external {
+		fillcolor="#F0F0F0" label=External style=filled
+		SQLite [label="SQLite DB" shape=cylinder]
+		LLMAPIs [label="LLM APIs\n(Ollama/Gemini/Anthropic)" shape=box3d]
+	}
+	StreamlitApp -> ChatPage [arrowhead=none]
+	StreamlitApp -> TasksPage [arrowhead=none]
+	StreamlitApp -> CalendarPage [arrowhead=none]
+	StreamlitApp -> SettingsPage [arrowhead=none]
+	ChatPage -> ChatHandler [label=processes]
+	ChatHandler -> GraphBuilder [label=uses]
+	GraphBuilder -> Supervisor [label="routes to"]
+	Supervisor -> Planning [label=routes style=dashed]
+	Supervisor -> Scheduling [label=routes style=dashed]
+	Supervisor -> Suggestion [label=routes style=dashed]
+	Planning -> TaskSvc [label=uses]
+	Planning -> LLMSvc [label=uses]
+	Scheduling -> TaskSvc [label=uses]
+	Scheduling -> CalendarSvc [label=uses]
+	Scheduling -> LLMSvc [label=uses]
+	TaskSvc -> TaskRepo [label=uses]
+	CalendarSvc -> TimeBlockRepo [label=uses]
+	TaskRepo -> DBManager [label=uses]
+	TimeBlockRepo -> DBManager [label=uses]
+	DBManager -> SQLite [label=connects]
+	LLMSvc -> LLMAPIs [label=calls]
+	SettingsPage -> SettingsMgr [label=configures]
+}
