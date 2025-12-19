@@ -1,0 +1,23 @@
+repos:
+  # Prevent pushing to dev and main branches
+  - repo: local
+    hooks:
+      - id: prevent-push-to-protected-branches
+        name: Prevent push to dev and main branches
+        entry: bash -c 'if [[ $0 == "dev" || $0 == "main" ]]; then echo "❌ Pushing to $0 branch is not allowed. Create a feature branch instead."; exit 1; fi'
+        language: system
+        stages: [pre-push]
+        pass_filenames: false
+        always_run: true
+
+  # Ruff linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.0
+    hooks:
+      - id: ruff
+        name: Ruff linting
+        args: [--fix]
+        stages: [pre-commit]
+      - id: ruff-format
+        name: Ruff format
+        stages: [pre-commit]
