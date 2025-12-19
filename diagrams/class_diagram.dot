@@ -1,0 +1,106 @@
+// ADHD-Planner UML Class Diagram
+digraph ADHD_Planner_Class_Diagram {
+	nodesep=0.5 rankdir=TB ranksep=1.0 splines=spline
+	node [fontname=Helvetica fontsize=10]
+	edge [fontname=Helvetica fontsize=9]
+	fontname="Helvetica-Bold" fontsize=16 label="ADHD-Planner - UML Class Diagram" labelloc=t
+	subgraph cluster_enums {
+		color=green label=Enumerations style=dashed
+		TaskStatus [label="{«enum»\nTaskStatus|NOT_STARTED\lIN_PROGRESS\lCOMPLETED\lBLOCKED\l}" fillcolor="#DDFFDD" shape=record style=filled]
+		Priority [label="{«enum»\nPriority|URGENT\lHIGH\lMEDIUM\lLOW\l}" fillcolor="#DDFFDD" shape=record style=filled]
+		EnergyLevel [label="{«enum»\nEnergyLevel|LOW\lMEDIUM\lHIGH\l}" fillcolor="#DDFFDD" shape=record style=filled]
+		BlockType [label="{«enum»\nBlockType|TASK\lBREAK\lBUFFER\lEVENT\lFREE\l}" fillcolor="#DDFFDD" shape=record style=filled]
+		SyncStatus [label="{«enum»\nSyncStatus|PENDING\lIN_PROGRESS\lCOMPLETED\lFAILED\l}" fillcolor="#DDFFDD" shape=record style=filled]
+	}
+	subgraph cluster_models {
+		color=orange label="Data Models (Pydantic)" style=dashed
+		BaseAppModel [label="{«abstract»\nBaseAppModel|+model_config: ConfigDict\l}" fillcolor="#FFE4B5" shape=record style=filled]
+		TimestampedModel [label="{TimestampedModel|+created_at: datetime\l+updated_at: datetime\l|+mark_updated()\l}" fillcolor="#FFE4B5" shape=record style=filled]
+		Task [label="{Task|+id: str\l+title: str\l+description: str\l+estimated_duration_minutes: int\l+deadline: datetime\l+status: TaskStatus\l+priority: Priority\l+estimated_energy_level: EnergyLevel\l+requires_focus: bool\l+tags: list[str]\l|+is_overdue: bool\l+is_completed: bool\l}" fillcolor="#FFE4B5" shape=record style=filled]
+		TimeBlock [label="{TimeBlock|+id: str\l+task_id: str\l+start_time: datetime\l+end_time: datetime\l+duration_minutes: int\l+block_type: BlockType\l+is_flexible: bool\l|+is_past: bool\l+is_current: bool\l}" fillcolor="#FFE4B5" shape=record style=filled]
+		CalendarEvent [label="{CalendarEvent|+id: str\l+title: str\l+start_time: datetime\l+end_time: datetime\l+source: EventSource\l+is_all_day: bool\l+related_task_id: str\l}" fillcolor="#FFE4B5" shape=record style=filled]
+		UserPreferences [label="{UserPreferences|+user_id: str\l+typical_work_start: str\l+typical_work_end: str\l+max_focus_duration: int\l+llm_provider: str\l+model_name: str\l}" fillcolor="#FFE4B5" shape=record style=filled]
+	}
+	subgraph cluster_orm {
+		color=purple label="Database ORM (SQLAlchemy)" style=dashed
+		TaskModel [label="{«Entity»\nTaskModel|+id: Column[String]\l+title: Column[String]\l+status: Column[String]\l+priority: Column[String]\l+time_blocks: relationship\l+sync_operations: relationship\l}" fillcolor="#E6E6FA" shape=record style=filled]
+		TimeBlockModel [label="{«Entity»\nTimeBlockModel|+id: Column[String]\l+task_id: Column[String] «FK»\l+start_time: Column[DateTime]\l+end_time: Column[DateTime]\l+task: relationship\l}" fillcolor="#E6E6FA" shape=record style=filled]
+		DatabaseManager [label="{DatabaseManager|-settings: Settings\l-engine: Engine\l-session_factory: sessionmaker\l|+get_session(): Session\l+create_tables()\l+drop_tables()\l}" fillcolor="#E6E6FA" shape=record style=filled]
+	}
+	subgraph cluster_repos {
+		color=coral label="Repository Layer" style=dashed
+		BaseRepository [label="{«Generic[T]»\nBaseRepository|#model: Type[T]\l#session: Session\l|+create(data): T\l+get_by_id(id): T\l+get_all(): list[T]\l+update(id, data): T\l+delete(id): bool\l+find_by_filters(): list[T]\l}" fillcolor="#FFDAB9" shape=record style=filled]
+		TaskRepository [label="{TaskRepository||+find_by_status()\l+find_overdue()\l+find_by_priority()\l+find_by_energy_level()\l+search_by_title()\l+get_statistics()\l}" fillcolor="#FFDAB9" shape=record style=filled]
+		TimeBlockRepository [label="{TimeBlockRepository||+find_by_date()\l+find_by_date_range()\l+find_conflicts()\l+find_by_task()\l+get_day_statistics()\l}" fillcolor="#FFDAB9" shape=record style=filled]
+	}
+	subgraph cluster_services {
+		color=blue label="Service Layer" style=dashed
+		TaskService [label="{TaskService|-repository: TaskRepository\l-calendar_service: CalendarService\l|+create_task()\l+update_task()\l+start_task()\l+complete_task()\l+delete_task()\l+list_tasks()\l}" fillcolor="#B0E0E6" shape=record style=filled]
+		CalendarService [label="{CalendarService|-repository: TimeBlockRepository\l|+create_time_block()\l+find_available_slots()\l+find_conflicts()\l+get_schedule_summary()\l}" fillcolor="#B0E0E6" shape=record style=filled]
+		TimeEstimationService [label="{TimeEstimationService|-task_repository: TaskRepository\l-llm_service: LLMService\l|+estimate_duration(): TimeEstimate\l+calculate_estimation_accuracy()\l}" fillcolor="#B0E0E6" shape=record style=filled]
+		LLMService [label="{LLMService|-provider: BaseLLMProvider\l|+generate(prompt): str\l+generate_with_metadata(): LLMResponse\l}" fillcolor="#B0E0E6" shape=record style=filled]
+		SettingsManager [label="{SettingsManager|-settings_path: Path\l-_user_settings: dict\l|+get(key)\l+set(key, value)\l+save()\l+reload()\l}" fillcolor="#B0E0E6" shape=record style=filled]
+	}
+	subgraph cluster_llm {
+		color=pink label="LLM Integration" style=dashed
+		BaseLLMProvider [label="{«abstract»\nBaseLLMProvider|#model_name: str\l#temperature: float\l|+generate(): LLMResponse\l+is_available(): bool\l}" fillcolor="#FFB6C1" shape=record style=filled]
+		OllamaProvider [label="{OllamaProvider|-base_url: str\l|+generate()\l+is_available()\l}" fillcolor="#FFB6C1" shape=record style=filled]
+		GeminiProvider [label="{GeminiProvider|-api_key: str\l|+generate()\l+is_available()\l}" fillcolor="#FFB6C1" shape=record style=filled]
+		AnthropicProvider [label="{AnthropicProvider|-api_key: str\l|+generate()\l+is_available()\l}" fillcolor="#FFB6C1" shape=record style=filled]
+	}
+	subgraph cluster_agents {
+		color=magenta label="Multi-Agent System" style=dashed
+		BaseAgent [label="{«abstract»\nBaseAgent|#name: str\l#services: dict\l#state_manager: StateManager\l|+execute(state): AgentState\l#handle_error()\l#add_response()\l}" fillcolor="#DDA0DD" shape=record style=filled]
+		SupervisorAgent [label="{SupervisorAgent|-llm_service: LLMService\l|+execute(state)\l-_classify_and_route()\l}" fillcolor="#DDA0DD" shape=record style=filled]
+		PlanningAgent [label="{PlanningAgent|-llm_service: LLMService\l-task_service: TaskService\l|+execute(state)\l-_extract_intent_and_data()\l-_create_task()\l}" fillcolor="#DDA0DD" shape=record style=filled]
+		SchedulingAgent [label="{SchedulingAgent|-llm_service: LLMService\l-task_service: TaskService\l-calendar_service: CalendarService\l|+execute(state)\l-_generate_schedule_suggestions()\l}" fillcolor="#DDA0DD" shape=record style=filled]
+		SuggestionAgent [label="{SuggestionAgent|-llm_service: LLMService\l-task_service: TaskService\l|+execute(state)\l-_get_task_suggestions()\l}" fillcolor="#DDA0DD" shape=record style=filled]
+	}
+	subgraph cluster_graph {
+		color=gold label="LangGraph System" style=dashed
+		AgentState [label="{«TypedDict»\nAgentState|+messages: Sequence[BaseMessage]\l+user_input: str\l+current_agent: str\l+routing_decision: str\l+context: dict\l+error: str\l}" fillcolor="#FFFACD" shape=record style=filled]
+		StateManager [label="{«static»\nStateManager||+create_initial_state()\l+add_message()\l+set_routing_decision()\l+update_context()\l+validate_state()\l}" fillcolor="#FFFACD" shape=record style=filled]
+		GraphBuilder [label="{GraphBuilder|-llm_service\l-task_service\l-calendar_service\l-agents_dict: dict\l-compiled_graph\l|+build_graph(): CompiledGraph\l+invoke(user_input): dict\l}" fillcolor="#FFFACD" shape=record style=filled]
+		ChatHandler [label="{ChatHandler|-graph: CompiledGraph\l|+process_message(input, context): str\l+stream_response()\l}" fillcolor="#FFFACD" shape=record style=filled]
+	}
+	TimestampedModel -> BaseAppModel [label=extends arrowhead=onormal]
+	Task -> TimestampedModel [label=extends arrowhead=onormal]
+	TimeBlock -> BaseAppModel [label=extends arrowhead=onormal]
+	CalendarEvent -> BaseAppModel [label=extends arrowhead=onormal]
+	UserPreferences -> BaseAppModel [label=extends arrowhead=onormal]
+	TaskRepository -> BaseRepository [label=extends arrowhead=onormal]
+	TimeBlockRepository -> BaseRepository [label=extends arrowhead=onormal]
+	OllamaProvider -> BaseLLMProvider [label=extends arrowhead=onormal]
+	GeminiProvider -> BaseLLMProvider [label=extends arrowhead=onormal]
+	AnthropicProvider -> BaseLLMProvider [label=extends arrowhead=onormal]
+	SupervisorAgent -> BaseAgent [label=extends arrowhead=onormal]
+	PlanningAgent -> BaseAgent [label=extends arrowhead=onormal]
+	SchedulingAgent -> BaseAgent [label=extends arrowhead=onormal]
+	SuggestionAgent -> BaseAgent [label=extends arrowhead=onormal]
+	TaskService -> TaskRepository [label=contains arrowhead=odiamond]
+	TaskService -> CalendarService [label=contains arrowhead=odiamond]
+	CalendarService -> TimeBlockRepository [label=contains arrowhead=odiamond]
+	TimeEstimationService -> TaskRepository [label=contains arrowhead=odiamond]
+	LLMService -> BaseLLMProvider [label=contains arrowhead=odiamond]
+	TaskRepository -> TaskModel [label=manages arrowhead=vee style=dashed]
+	TimeBlockRepository -> TimeBlockModel [label=manages arrowhead=vee style=dashed]
+	GraphBuilder -> SupervisorAgent [label=creates arrowhead=vee style=dashed]
+	GraphBuilder -> PlanningAgent [label=creates arrowhead=vee style=dashed]
+	GraphBuilder -> SchedulingAgent [label=creates arrowhead=vee style=dashed]
+	GraphBuilder -> SuggestionAgent [label=creates arrowhead=vee style=dashed]
+	ChatHandler -> GraphBuilder [label=uses arrowhead=vee style=dashed]
+	GraphBuilder -> AgentState [label=manages arrowhead=vee style=dashed]
+	BaseAgent -> StateManager [label=uses arrowhead=vee style=dashed]
+	SupervisorAgent -> LLMService [label=uses arrowhead=vee style=dashed]
+	PlanningAgent -> LLMService [label=uses arrowhead=vee style=dashed]
+	PlanningAgent -> TaskService [label=uses arrowhead=vee style=dashed]
+	SchedulingAgent -> LLMService [label=uses arrowhead=vee style=dashed]
+	SchedulingAgent -> TaskService [label=uses arrowhead=vee style=dashed]
+	SchedulingAgent -> CalendarService [label=uses arrowhead=vee style=dashed]
+	Task -> TaskStatus [arrowhead=vee style=dotted]
+	Task -> Priority [arrowhead=vee style=dotted]
+	Task -> EnergyLevel [arrowhead=vee style=dotted]
+	TimeBlock -> BlockType [arrowhead=vee style=dotted]
+	TaskModel -> TimeBlockModel [label="1..*" arrowhead=crow arrowtail=none]
+	DatabaseManager -> TaskModel [label=manages arrowhead=vee style=dashed]
+}

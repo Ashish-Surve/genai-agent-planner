@@ -1,0 +1,18 @@
+// ADHD-Planner ER Diagram
+digraph ADHD_Planner_ER_Diagram {
+	nodesep=0.5 rankdir=LR ranksep=1.5 splines=spline
+	node [fontname=Helvetica fontsize=10]
+	edge [fontname=Helvetica fontsize=9]
+	fontname="Helvetica-Bold" fontsize=16 label="ADHD-Planner - Entity Relationship Diagram" labelloc=t
+	tasks [label="{tasks|id: VARCHAR(36) «PK»\l|title: VARCHAR(200)\ldescription: TEXT\lestimated_duration_minutes: INT\ldeadline: DATETIME\lstatus: VARCHAR(20)\lpriority: VARCHAR(10)\ltags: JSON\l...\l}" fillcolor="#B0E0E6" shape=record style=filled]
+	time_blocks [label="{time_blocks|id: VARCHAR(36) «PK»\ltask_id: VARCHAR(36) «FK»\l|start_time: DATETIME\lend_time: DATETIME\lduration_minutes: INT\lblock_type: VARCHAR(10)\lis_flexible: BOOLEAN\l...\l}" fillcolor="#FFE4B5" shape=record style=filled]
+	calendar_events [label="{calendar_events|id: VARCHAR(36) «PK»\lrelated_task_id: VARCHAR(36) «FK»\l|title: VARCHAR(200)\lstart_time: DATETIME\lend_time: DATETIME\lsource: VARCHAR(20)\lis_all_day: BOOLEAN\l...\l}" fillcolor="#DDA0DD" shape=record style=filled]
+	user_preferences [label="{user_preferences|id: VARCHAR(36) «PK»\l|user_id: VARCHAR(100)\ltypical_work_start: VARCHAR(5)\ltypical_work_end: VARCHAR(5)\lmax_focus_duration: INT\lllm_provider: VARCHAR(20)\l...\l}" fillcolor="#98FB98" shape=record style=filled]
+	energy_logs [label="{energy_logs|id: VARCHAR(36) «PK»\l|timestamp: DATETIME\lreported_energy: VARCHAR(10)\lpredicted_energy: VARCHAR(10)\ltasks_completed: INT\l...\l}" fillcolor="#F0E68C" shape=record style=filled]
+	sync_operations [label="{sync_operations|id: VARCHAR(36) «PK»\ltask_id: VARCHAR(36) «FK»\l|operation_type: VARCHAR(10)\ldirection: VARCHAR(20)\lstatus: VARCHAR(20)\lerror_message: TEXT\l...\l}" fillcolor="#FFB6C1" shape=record style=filled]
+	task_dependencies [label="{task_dependencies|task_id: VARCHAR(36) «PK,FK»\ldepends_on_id: VARCHAR(36) «PK,FK»\l}" fillcolor="#E6E6FA" shape=record style=filled]
+	tasks -> time_blocks [label="1:N" arrowhead=crow arrowtail=tee dir=both]
+	tasks -> calendar_events [label="1:N" arrowhead=crow arrowtail=tee dir=both]
+	tasks -> sync_operations [label="1:N" arrowhead=crow arrowtail=tee dir=both]
+	tasks -> task_dependencies [label="N:M\n(self-ref)" arrowhead=crow arrowtail=crow dir=both]
+}
