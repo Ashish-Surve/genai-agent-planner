@@ -38,7 +38,7 @@ class TestDailyProductivityWorkflow:
     def test_morning_planning_session(self, task_service, calendar_service, chat_handler):
         """Test morning planning workflow."""
         # User reviews tasks
-        tasks = task_service.list_tasks()
+        task_service.list_tasks()
 
         # Create high-priority tasks for today
         task1 = task_service.create_task(
@@ -98,7 +98,7 @@ class TestDailyProductivityWorkflow:
         # Schedule them with is_flexible=True
         now = datetime.combine(target_date, time(10, 0))
 
-        block1 = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             task_id=task1.id,
             start_time=now,
             end_time=now + timedelta(hours=1),
@@ -106,7 +106,7 @@ class TestDailyProductivityWorkflow:
             is_flexible=True,
         )
 
-        block2 = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             task_id=task2.id,
             start_time=now + timedelta(hours=1, minutes=15),
             end_time=now + timedelta(hours=2),
@@ -130,7 +130,7 @@ class TestDailyProductivityWorkflow:
             priority="HIGH",
         )
 
-        block = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             task_id=task.id,
             start_time=now,
             end_time=now + timedelta(hours=2),
@@ -146,7 +146,7 @@ class TestDailyProductivityWorkflow:
         )
 
         # Try to fit in the schedule (use actual API signature)
-        available_slots = calendar_service.find_available_slots(
+        calendar_service.find_available_slots(
             target_date=target_date,
             duration_minutes=30,
         )
@@ -208,7 +208,7 @@ class TestTaskDependencies:
         )
 
         # Create dependent tasks (use correct parameter name: dependency_ids)
-        child1 = task_service.create_task(
+        task_service.create_task(
             title="Design database schema",
             estimated_duration_minutes=120,
             priority="HIGH",
@@ -267,14 +267,14 @@ class TestMultiPriorityManagement:
     def test_balance_urgent_and_important(self, task_service):
         """Test balancing urgent vs important tasks."""
         # Create urgent but not important
-        urgent = task_service.create_task(
+        task_service.create_task(
             title="Urgent email response",
             estimated_duration_minutes=15,
             priority="URGENT",
         )
 
         # Create important but not urgent
-        important = task_service.create_task(
+        task_service.create_task(
             title="Long-term project planning",
             estimated_duration_minutes=120,
             priority="HIGH",
@@ -282,7 +282,7 @@ class TestMultiPriorityManagement:
         )
 
         # Create both urgent and important
-        critical = task_service.create_task(
+        task_service.create_task(
             title="Critical deadline",
             estimated_duration_minutes=240,
             priority="URGENT",
@@ -313,7 +313,7 @@ class TestOverdueManagement:
         """Test identifying overdue tasks - validation prevents creating overdue tasks."""
         # Create a task with future deadline
         future_deadline = datetime.utcnow() + timedelta(days=1)
-        task = task_service.create_task(
+        task_service.create_task(
             title="Future task",
             estimated_duration_minutes=60,
             priority="HIGH",
@@ -374,7 +374,7 @@ class TestContextSwitching:
             priority="HIGH",
         )
 
-        focused_block = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             task_id=focused.id,
             start_time=now,
             end_time=now + timedelta(hours=2),
@@ -396,7 +396,7 @@ class TestContextSwitching:
         )
 
         if available:
-            quick_block = calendar_service.create_time_block(
+            calendar_service.create_time_block(
                 task_id=quick.id,
                 start_time=available[0].start,
                 end_time=available[0].end,
@@ -455,7 +455,7 @@ class TestContextualFiltering:
             context_category="work",
         )
 
-        personal_task = task_service.create_task(
+        task_service.create_task(
             title="Personal task",
             estimated_duration_minutes=30,
             priority="MEDIUM",
@@ -475,7 +475,7 @@ class TestContextualFiltering:
             requires_focus=True,
         )
 
-        easy_task = task_service.create_task(
+        task_service.create_task(
             title="Admin work",
             estimated_duration_minutes=30,
             priority="LOW",

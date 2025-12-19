@@ -99,7 +99,7 @@ class TestCalendarTimeBlockCreation:
         now = datetime.now()
 
         # Create first block with is_flexible=True to avoid conflict on creation
-        block1 = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             task_id=sample_task_id,
             start_time=now + timedelta(hours=1),
             end_time=now + timedelta(hours=2),

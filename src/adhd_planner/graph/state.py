@@ -1,7 +1,9 @@
 """LangGraph state definition for ADHD Planner agent system."""
 
-from typing import TypedDict, Annotated, Sequence
+from collections.abc import Sequence
 from operator import add
+from typing import Annotated, TypedDict
+
 from langchain_core.messages import BaseMessage
 
 

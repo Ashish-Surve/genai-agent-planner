@@ -4,8 +4,8 @@ from typing import Any, Generic, TypeVar
 
 from sqlalchemy.orm import Session
 
-from src.adhd_planner.utils.logger import get_logger
-from src.database.schema import Base
+from adhd_planner.database.schema import Base
+from adhd_planner.utils.logger import get_logger
 
 # Type variable for the SQLAlchemy model
 ModelType = TypeVar("ModelType", bound=Base)

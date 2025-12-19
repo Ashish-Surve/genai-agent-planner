@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import Field
 
-from src.models.base import BaseAppModel
-from src.models.enums import EventSource
+from adhd_planner.models.base import BaseAppModel
+from adhd_planner.models.enums import EventSource
 
 
 class CalendarEvent(BaseAppModel):

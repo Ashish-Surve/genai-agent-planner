@@ -1,7 +1,8 @@
 """Utilities for managing AgentState in the LangGraph system."""
 
 from typing import Any
-from langchain_core.messages import HumanMessage, AIMessage, BaseMessage
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from adhd_planner.graph.state import AgentState
 from adhd_planner.utils.logger import get_logger
@@ -30,7 +31,7 @@ class StateManager:
             routing_decision=None,
             context={},
             error=None,
-            metadata={}
+            metadata={},
         )
 
     @staticmethod
@@ -62,10 +63,7 @@ class StateManager:
         Returns:
             Updated state
         """
-        message = AIMessage(
-            content=content,
-            additional_kwargs={"agent": agent_name}
-        )
+        message = AIMessage(content=content, additional_kwargs={"agent": agent_name})
         return StateManager.add_message(state, message)
 
     @staticmethod
@@ -169,7 +167,7 @@ class StateManager:
             if field not in state:
                 raise ValueError(f"State missing required field: {field}")
 
-        if not isinstance(state.get("messages"), (list, tuple)):
+        if not isinstance(state.get("messages"), list | tuple):
             raise ValueError("State 'messages' must be a sequence")
 
         return True

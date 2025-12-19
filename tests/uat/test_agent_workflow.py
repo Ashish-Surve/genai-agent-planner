@@ -3,15 +3,17 @@
 Tests the full agent workflow: add a task and plan it using the Chat API.
 """
 
+import os
 import sys
 from pathlib import Path
 
-# Add src directory to path
+# Add src directory to path - noqa: E402
 src_path = Path(__file__).parent.parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from adhd_planner.utils.logger import get_logger
-from adhd_planner.utils.config import get_settings
+# noqa: E402
+from adhd_planner.utils.config import get_settings  # noqa: E402
+from adhd_planner.utils.logger import get_logger  # noqa: E402
 
 logger = get_logger("uat_test")
 
@@ -26,17 +28,15 @@ def test_supervisor_and_agents():
     print("\n[Step 1] Initializing services...")
 
     try:
-        from database.connection import get_db
-        from repositories.task_repository import TaskRepository
-        from services.task_service import TaskService
-        from repositories.time_block_repository import TimeBlockRepository
-        from services.calendar_service import CalendarService
+        from adhd_planner.database.connection import get_db
+        from adhd_planner.repositories.time_block_repository import TimeBlockRepository
+        from adhd_planner.services.calendar_service import CalendarService
         from adhd_planner.services.llm_service import LLMService
+        from adhd_planner.services.task_service import TaskService
 
         db = get_db()
         session = db.session_factory()
 
-        task_repository = TaskRepository(session)
         task_service = TaskService(session)
 
         time_block_repository = TimeBlockRepository(session)
@@ -53,6 +53,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error initializing services: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -73,6 +74,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error building graph: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -88,19 +90,22 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error creating ChatHandler: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
     # Step 4: Test adding a task
     print("\n[Step 4] Testing: Add a task...")
-    print("  User Input: 'Add task: Write unit tests for the calendar service, 2 hours, high priority'")
+    print(
+        "  User Input: 'Add task: Write unit tests for the calendar service, 2 hours, high priority'"
+    )
 
     try:
         response = chat_handler.process_message(
             "Add task: Write unit tests for the calendar service, 2 hours, high priority"
         )
         print(f"\n  Agent Response:\n  {'-' * 50}")
-        for line in response.split('\n'):
+        for line in response.split("\n"):
             print(f"  {line}")
         print(f"  {'-' * 50}")
         print("  [OK] Task addition test completed")
@@ -108,6 +113,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error adding task: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -118,7 +124,7 @@ def test_supervisor_and_agents():
     try:
         response = chat_handler.process_message("Plan my day")
         print(f"\n  Agent Response:\n  {'-' * 50}")
-        for line in response.split('\n'):
+        for line in response.split("\n"):
             print(f"  {line}")
         print(f"  {'-' * 50}")
         print("  [OK] Planning test completed")
@@ -126,6 +132,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error planning day: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -136,7 +143,7 @@ def test_supervisor_and_agents():
     try:
         response = chat_handler.process_message("What should I work on right now?")
         print(f"\n  Agent Response:\n  {'-' * 50}")
-        for line in response.split('\n'):
+        for line in response.split("\n"):
             print(f"  {line}")
         print(f"  {'-' * 50}")
         print("  [OK] Suggestion test completed")
@@ -144,6 +151,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error getting suggestion: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -160,6 +168,7 @@ def test_supervisor_and_agents():
     except Exception as e:
         print(f"  [FAILED] Error listing tasks: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -194,7 +203,7 @@ def test_direct_llm():
         print("[Test] Sending test prompt...")
         response = llm_service.generate(
             prompt="Say 'Hello, I am working!' in exactly 5 words.",
-            system_prompt="You are a helpful assistant. Respond concisely."
+            system_prompt="You are a helpful assistant. Respond concisely.",
         )
 
         print(f"[Response] {response}")
@@ -204,12 +213,14 @@ def test_direct_llm():
     except Exception as e:
         print(f"\n[FAILED] LLM connection error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
 
 if __name__ == "__main__":
     import os
+
     os.chdir(Path(__file__).parent.parent.parent)
 
     print(f"Working directory: {os.getcwd()}")

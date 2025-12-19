@@ -293,7 +293,7 @@ class TestDeleteTask:
     def test_cannot_delete_task_with_dependents(self, task_service):
         """Test that tasks with dependents cannot be deleted."""
         task1 = task_service.create_task(title="Task 1")
-        task2 = task_service.create_task(title="Task 2", dependency_ids=[task1.id])
+        task_service.create_task(title="Task 2", dependency_ids=[task1.id])
 
         with pytest.raises(UserFacingError, match="dependents"):
             task_service.delete_task(task1.id)

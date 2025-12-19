@@ -44,14 +44,17 @@ def task_card(
 
         with col1:
             # Checkbox for completion
-            checked = st.checkbox(
+            def on_checkbox_change(task_id=task_id, on_complete=on_complete):
+                if on_complete:
+                    on_complete(task_id)
+
+            st.checkbox(
                 "Complete",
                 value=is_completed,
                 key=f"task_check_{task_id}",
                 label_visibility="collapsed",
+                on_change=on_checkbox_change,
             )
-            if checked != is_completed and on_complete:
-                on_complete(task_id)
 
         with col2:
             # Task title with strikethrough if completed

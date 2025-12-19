@@ -1,8 +1,9 @@
 """Tests for Supervisor Agent."""
 
 import json
-import pytest
 from unittest.mock import Mock
+
+import pytest
 
 from adhd_planner.agents.supervisor import SupervisorAgent
 from adhd_planner.graph.state_utils import StateManager
@@ -148,11 +149,9 @@ class TestSupervisorAgent:
 
         # Create state with message history
         state = StateManager.create_initial_state("Add another task")
-        state = StateManager.add_ai_message(
-            state, "I added your task", "planning_agent"
-        )
+        state = StateManager.add_ai_message(state, "I added your task", "planning_agent")
 
-        result = supervisor.execute(state)
+        supervisor.execute(state)
 
         # Verify LLM was called with context
         call_args = mock_llm_service.generate.call_args

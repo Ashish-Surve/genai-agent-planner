@@ -6,8 +6,8 @@ from typing import Any
 
 from adhd_planner.agents.base import BaseAgent
 from adhd_planner.graph.state import AgentState
-from models.task import TaskCreate
-from models.enums import Priority, EnergyLevel
+from adhd_planner.models.enums import EnergyLevel, Priority
+from adhd_planner.models.task import TaskCreate
 from adhd_planner.utils.prompts.planning_prompts import (
     PLANNING_SYSTEM_PROMPT,
     get_task_extraction_prompt,
@@ -43,6 +43,10 @@ class PlanningAgent(BaseAgent):
             self.log_execution(state)
 
             user_input = state["user_input"]
+
+            # Check if this is a list/view request instead of create
+            if self._is_list_request(user_input):
+                return self._handle_list_request(state)
 
             # Extract task details from natural language
             task_data = self._extract_task_details(user_input)
@@ -80,7 +84,6 @@ class PlanningAgent(BaseAgent):
         response = llm_service.generate(
             prompt=prompt,
             system_prompt=PLANNING_SYSTEM_PROMPT,
-            temperature=0.3,
         )
 
         task_data = json.loads(response)
@@ -105,6 +108,46 @@ class PlanningAgent(BaseAgent):
         task = task_service.create_task(task_create)
         self.logger.info(f"Created task: {task.title} (ID: {task.id})")
         return task
+
+    def _is_list_request(self, user_input: str) -> bool:
+        """Check if user is asking to list or view tasks."""
+        list_keywords = ["list", "show", "view", "get", "all tasks", "tasks", "what tasks"]
+        user_lower = user_input.lower()
+
+        # Check if it's asking to create/add
+        create_keywords = ["add", "create", "new task", "make", "schedule"]
+        has_create_intent = any(kw in user_lower for kw in create_keywords)
+
+        # It's a list request if it contains list keywords and NOT create keywords
+        return any(kw in user_lower for kw in list_keywords) and not has_create_intent
+
+    def _handle_list_request(self, state: AgentState) -> AgentState:
+        """Handle task list/view requests."""
+        task_service = self.get_service("task_service")
+
+        try:
+            tasks = task_service.get_incomplete_tasks()
+
+            if not tasks:
+                response = "No incomplete tasks found. You're all caught up!"
+            else:
+                response = "📋 **Your Tasks:**\n\n"
+                for i, task in enumerate(tasks, 1):
+                    response += f"{i}. **{task.title}**\n"
+                    if task.description:
+                        response += f"   {task.description}\n"
+                    response += f"   Priority: {task.priority.value} | "
+                    response += f"Duration: {task.estimated_duration_minutes or '?'} min\n"
+                    if task.deadline:
+                        response += f"   Due: {task.deadline.strftime('%Y-%m-%d %H:%M')}\n"
+                    response += "\n"
+
+            state = self.add_response(state, response)
+            state["routing_decision"] = "END"
+            return state
+
+        except Exception as e:
+            return self.handle_error(state, e)
 
     def _format_response(self, task: Any) -> str:
         """Format user-friendly response."""

@@ -1,8 +1,8 @@
 """Pydantic models for data validation and transfer."""
 
-from src.models.calendar_event import CalendarEvent
-from src.models.energy_log import EnergyLog
-from src.models.enums import (
+from adhd_planner.models.calendar_event import CalendarEvent
+from adhd_planner.models.energy_log import EnergyLog
+from adhd_planner.models.enums import (
     BlockType,
     EnergyLevel,
     EventSource,
@@ -12,10 +12,10 @@ from src.models.enums import (
     SyncStatus,
     TaskStatus,
 )
-from src.models.sync_operation import SyncOperation
-from src.models.task import Task, TaskCreate, TaskUpdate
-from src.models.time_block import TimeBlock, TimeBlockCreate, TimeBlockUpdate
-from src.models.user_preferences import EnergyTimeSlot, UserPreferences
+from adhd_planner.models.sync_operation import SyncOperation
+from adhd_planner.models.task import Task, TaskCreate, TaskUpdate
+from adhd_planner.models.time_block import TimeBlock, TimeBlockCreate, TimeBlockUpdate
+from adhd_planner.models.user_preferences import EnergyTimeSlot, UserPreferences
 
 __all__ = [
     # Enums

@@ -1,13 +1,13 @@
 """Tests for Planning Agent."""
 
 import json
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from datetime import datetime
-from unittest.mock import Mock, MagicMock
+from models.enums import EnergyLevel, Priority
 
 from adhd_planner.agents.planning_agent import PlanningAgent
 from adhd_planner.graph.state_utils import StateManager
-from models.enums import Priority, EnergyLevel
 
 
 class TestPlanningAgent:

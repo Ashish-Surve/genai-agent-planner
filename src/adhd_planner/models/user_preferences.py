@@ -2,7 +2,7 @@
 
 from pydantic import Field
 
-from src.models.base import BaseAppModel
+from adhd_planner.models.base import BaseAppModel
 
 
 class EnergyTimeSlot(BaseAppModel):

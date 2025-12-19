@@ -6,9 +6,9 @@ from typing import Any
 from adhd_planner.agents.base import BaseAgent
 from adhd_planner.graph.state import AgentState
 from adhd_planner.utils.prompts.supervisor_prompts import (
+    DIRECT_RESPONSE_PROMPT,
     SUPERVISOR_SYSTEM_PROMPT,
     get_routing_prompt,
-    DIRECT_RESPONSE_PROMPT,
 )
 
 
@@ -77,9 +77,7 @@ class SupervisorAgent(BaseAgent):
         except Exception as e:
             return self.handle_error(state, e)
 
-    def _classify_and_route(
-        self, user_input: str, conversation_history: str
-    ) -> dict[str, Any]:
+    def _classify_and_route(self, user_input: str, conversation_history: str) -> dict[str, Any]:
         """
         Classify user intent and determine routing.
 
@@ -100,7 +98,6 @@ class SupervisorAgent(BaseAgent):
             response = llm_service.generate(
                 prompt=prompt,
                 system_prompt=SUPERVISOR_SYSTEM_PROMPT,
-                temperature=0.1,  # Low temperature for consistent routing
             )
 
             # Parse JSON response
@@ -174,7 +171,7 @@ class SupervisorAgent(BaseAgent):
 
         prompt = DIRECT_RESPONSE_PROMPT.format(user_input=user_input)
 
-        response = llm_service.generate(prompt=prompt, temperature=0.7)
+        response = llm_service.generate(prompt=prompt)
 
         return self.add_response(state, response)
 

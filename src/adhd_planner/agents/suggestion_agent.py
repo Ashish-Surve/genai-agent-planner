@@ -61,7 +61,6 @@ class SuggestionAgent(BaseAgent):
 
     def _get_task_suggestions(self, tasks: list[Any]) -> list[dict]:
         """Get task suggestions based on context."""
-        current_hour = datetime.now().hour
         suggestions = []
 
         # Sort by suitability
@@ -108,7 +107,9 @@ class SuggestionAgent(BaseAgent):
 
         for i, suggestion in enumerate(suggestions, 1):
             response += f"{i}. **{suggestion['task_title']}**\n"
-            response += f"   Duration: {suggestion['duration']} min | Priority: {suggestion['priority']}\n"
+            response += (
+                f"   Duration: {suggestion['duration']} min | Priority: {suggestion['priority']}\n"
+            )
             response += f"   Why: {suggestion['reason']}\n\n"
 
         return response

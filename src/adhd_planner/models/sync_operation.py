@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import Field
 
-from src.models.base import TimestampedModel
-from src.models.enums import SyncDirection, SyncOperationType, SyncStatus
+from adhd_planner.models.base import TimestampedModel
+from adhd_planner.models.enums import SyncDirection, SyncOperationType, SyncStatus
 
 
 class SyncOperation(TimestampedModel):

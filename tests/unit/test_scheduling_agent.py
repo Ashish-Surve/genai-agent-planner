@@ -1,11 +1,12 @@
 """Tests for Scheduling Agent."""
 
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
+from models.enums import EnergyLevel, Priority
 
 from adhd_planner.agents.scheduling_agent import SchedulingAgent
 from adhd_planner.graph.state_utils import StateManager
-from models.enums import Priority, EnergyLevel
 
 
 class TestSchedulingAgent:
@@ -72,9 +73,7 @@ class TestSchedulingAgent:
 
     def test_error_handling(self, scheduling_agent, mock_services):
         """Test error handling."""
-        mock_services["task_service"].get_incomplete_tasks.side_effect = Exception(
-            "Service error"
-        )
+        mock_services["task_service"].get_incomplete_tasks.side_effect = Exception("Service error")
 
         state = StateManager.create_initial_state("Plan my day")
         result = scheduling_agent.execute(state)

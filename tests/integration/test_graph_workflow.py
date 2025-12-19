@@ -1,10 +1,11 @@
 """Integration tests for graph workflow."""
 
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
+from models.enums import EnergyLevel, Priority
 
 from adhd_planner.graph.builder import GraphBuilder
-from models.enums import Priority, EnergyLevel
 
 
 class TestGraphWorkflow:

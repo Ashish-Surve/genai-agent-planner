@@ -138,7 +138,7 @@ class TestTasksPageRetrieval:
         """Test filtering tasks by status."""
         # Create tasks with different statuses
         task1 = task_service.create_task(**sample_task_data)
-        task2 = task_service.create_task(
+        task_service.create_task(
             title="Task 2",
             estimated_duration_minutes=30,
             priority="HIGH",
@@ -176,7 +176,7 @@ class TestTasksPageRetrieval:
         """Test retrieving overdue tasks."""
         # Create a task with past deadline - bypass validation by creating with future then updating
         future_deadline = datetime.utcnow() + timedelta(days=1)
-        task = task_service.create_task(
+        task_service.create_task(
             title="Will Be Overdue Task",
             estimated_duration_minutes=30,
             deadline=future_deadline,
@@ -261,7 +261,7 @@ class TestTasksPageDelete:
             estimated_duration_minutes=30,
             priority="HIGH",
         )
-        task2 = task_service.create_task(
+        task_service.create_task(
             title="Dependent Task",
             estimated_duration_minutes=30,
             priority="HIGH",

@@ -1,6 +1,5 @@
 """Scheduling Agent - Generates ADHD-friendly schedules."""
 
-import json
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -93,7 +92,9 @@ class SchedulingAgent(BaseAgent):
 
         for i, suggestion in enumerate(suggestions, 1):
             response += f"{i}. **{suggestion['task_title']}**\n"
-            response += f"   Duration: {suggestion['duration']} min | Priority: {suggestion['priority']}\n"
+            response += (
+                f"   Duration: {suggestion['duration']} min | Priority: {suggestion['priority']}\n"
+            )
             response += f"   Reasoning: {suggestion['reasoning']}\n\n"
 
         return response

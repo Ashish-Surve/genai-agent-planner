@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session, joinedload
 
-from src.adhd_planner.utils.logger import get_logger
-from src.database.schema import TaskModel
-from src.repositories.base_repository import BaseRepository
+from adhd_planner.database.schema import TaskModel
+from adhd_planner.repositories.base_repository import BaseRepository
+from adhd_planner.utils.logger import get_logger
 
 logger = get_logger("task_repository")
 
@@ -161,7 +161,7 @@ class TaskRepository(BaseRepository[TaskModel]):
         try:
             tasks = (
                 self.session.query(self.model)
-                .filter(self.model.requires_focus == True, self.model.status != "COMPLETED")
+                .filter(self.model.requires_focus, self.model.status != "COMPLETED")
                 .order_by(self.model.priority.desc())
                 .all()
             )
@@ -196,7 +196,7 @@ class TaskRepository(BaseRepository[TaskModel]):
         try:
             tasks = (
                 self.session.query(self.model)
-                .filter(self.model.sync_enabled == True, self.model.sync_status == "PENDING")
+                .filter(self.model.sync_enabled, self.model.sync_status == "PENDING")
                 .all()
             )
 

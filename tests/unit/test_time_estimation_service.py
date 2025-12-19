@@ -305,7 +305,7 @@ def test_estimate_from_history(estimation_service, test_db_session):
     repo = TaskRepository(test_db_session)
 
     # Create similar completed tasks
-    for i in range(3):
+    for _ in range(3):
         task_data = {
             "title": "Write documentation",
             "estimated_duration_minutes": 30,
@@ -335,7 +335,7 @@ def test_confidence_increases_with_more_data(estimation_service, test_db_session
     repo = TaskRepository(test_db_session)
 
     # Create 1 similar task
-    for i in range(1):
+    for _ in range(1):
         task_data = {
             "title": "Write doc",
             "estimated_duration_minutes": 30,
@@ -351,7 +351,7 @@ def test_confidence_increases_with_more_data(estimation_service, test_db_session
     conf1 = estimate1.confidence if estimate1 else 0
 
     # Add more similar tasks
-    for i in range(5):
+    for _ in range(5):
         task_data = {
             "title": "Write content",
             "estimated_duration_minutes": 30,

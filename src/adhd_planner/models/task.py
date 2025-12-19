@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import Field, computed_field, field_validator
 
-from src.models.base import BaseAppModel, TimestampedModel
-from src.models.enums import EnergyLevel, Priority, SyncStatus, TaskStatus
+from adhd_planner.models.base import BaseAppModel, TimestampedModel
+from adhd_planner.models.enums import EnergyLevel, Priority, SyncStatus, TaskStatus
 
 
 class Task(TimestampedModel):

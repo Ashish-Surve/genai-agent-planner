@@ -1,11 +1,9 @@
 """Tests for graph edge functions."""
 
-import pytest
-
 from adhd_planner.graph.edges import (
+    route_after_specialist,
     route_to_agent,
     should_continue,
-    route_after_specialist,
 )
 from adhd_planner.graph.state_utils import StateManager
 

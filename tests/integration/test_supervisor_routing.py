@@ -1,11 +1,12 @@
 """Integration tests for supervisor routing."""
 
-import pytest
 from unittest.mock import Mock
 
+import pytest
+
 from adhd_planner.agents.supervisor import SupervisorAgent
-from adhd_planner.graph.state_utils import StateManager
 from adhd_planner.graph.edges import route_to_agent
+from adhd_planner.graph.state_utils import StateManager
 
 
 class TestSupervisorIntegration:

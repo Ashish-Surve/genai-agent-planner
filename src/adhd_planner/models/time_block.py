@@ -4,8 +4,8 @@ from datetime import datetime
 
 from pydantic import Field, computed_field, field_validator
 
-from src.models.base import BaseAppModel
-from src.models.enums import BlockType, EnergyLevel
+from adhd_planner.models.base import BaseAppModel
+from adhd_planner.models.enums import BlockType, EnergyLevel
 
 
 class TimeBlock(BaseAppModel):

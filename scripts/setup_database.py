@@ -6,9 +6,9 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.database.connection import get_db
-from src.database.schema import Base, UserPreferencesModel
-from src.adhd_planner.utils.logger import get_logger
+from adhd_planner.database.connection import get_db
+from adhd_planner.database.schema import UserPreferencesModel
+from adhd_planner.utils.logger import get_logger
 
 logger = get_logger("setup_database")
 
@@ -41,12 +41,8 @@ def setup_database(reset: bool = False):
                 typical_work_start="09:00",
                 typical_work_end="17:00",
                 max_focus_duration=45,
-                peak_energy_times=[
-                    {"start": "09:00", "end": "12:00"}
-                ],
-                low_energy_times=[
-                    {"start": "14:00", "end": "16:00"}
-                ]
+                peak_energy_times=[{"start": "09:00", "end": "12:00"}],
+                low_energy_times=[{"start": "14:00", "end": "16:00"}],
             )
             session.add(default_prefs)
             session.commit()

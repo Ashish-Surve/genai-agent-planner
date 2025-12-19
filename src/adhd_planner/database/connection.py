@@ -8,8 +8,8 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from src.adhd_planner.utils.config import get_settings
-from src.adhd_planner.utils.logger import get_logger
+from adhd_planner.utils.config import get_settings
+from adhd_planner.utils.logger import get_logger
 
 logger = get_logger("database")
 
@@ -75,14 +75,14 @@ class DatabaseManager:
 
     def create_tables(self):
         """Create all tables (for testing, use Alembic in production)."""
-        from src.database.schema import Base
+        from adhd_planner.database.schema import Base
 
         Base.metadata.create_all(self.engine)
         logger.info("Database tables created")
 
     def drop_tables(self):
         """Drop all tables (for testing only!)."""
-        from src.database.schema import Base
+        from adhd_planner.database.schema import Base
 
         Base.metadata.drop_all(self.engine)
         logger.warning("Database tables dropped")

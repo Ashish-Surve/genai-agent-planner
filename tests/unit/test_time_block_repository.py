@@ -189,7 +189,7 @@ def test_find_flexible_blocks(block_repo):
 
     flexible = block_repo.find_flexible_blocks()
     assert len(flexible) == 1
-    assert flexible[0].is_flexible == True
+    assert flexible[0].is_flexible
 
 
 def test_find_current_and_upcoming(block_repo):

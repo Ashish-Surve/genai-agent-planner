@@ -47,7 +47,7 @@ class TestSettingsInitialization:
 
     def test_settings_file_creation(self, temp_settings_file):
         """Test settings manager works with temp file."""
-        manager = SettingsManager(settings_path=Path(temp_settings_file))
+        SettingsManager(settings_path=Path(temp_settings_file))
         assert Path(temp_settings_file).exists()
 
 
@@ -279,7 +279,10 @@ class TestSettingsReset:
 
         # Should return default values for user settings
         assert settings_manager.get("theme") == SettingsManager.DEFAULT_USER_SETTINGS["theme"]
-        assert settings_manager.get("morning_energy") == SettingsManager.DEFAULT_USER_SETTINGS["morning_energy"]
+        assert (
+            settings_manager.get("morning_energy")
+            == SettingsManager.DEFAULT_USER_SETTINGS["morning_energy"]
+        )
 
     def test_reset_single_setting(self, settings_manager):
         """Test resetting a single setting."""
@@ -449,7 +452,10 @@ class TestSettingsIntegration:
         assert manager.get("theme") == "dark"
         assert manager.get("morning_energy") == "low"
         # Should have defaults for unspecified keys
-        assert manager.get("afternoon_energy") == SettingsManager.DEFAULT_USER_SETTINGS["afternoon_energy"]
+        assert (
+            manager.get("afternoon_energy")
+            == SettingsManager.DEFAULT_USER_SETTINGS["afternoon_energy"]
+        )
 
     def test_user_presets(self, settings_manager):
         """Test saving and loading user presets."""

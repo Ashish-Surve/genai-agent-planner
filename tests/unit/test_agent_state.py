@@ -1,7 +1,7 @@
 """Tests for AgentState and StateManager."""
 
 import pytest
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from adhd_planner.graph.state import AgentState
 from adhd_planner.graph.state_utils import StateManager
@@ -108,7 +108,7 @@ class TestStateManager:
             routing_decision=None,
             context={},
             error=None,
-            metadata={}
+            metadata={},
         )
 
         with pytest.raises(ValueError, match="missing required field"):
@@ -123,7 +123,7 @@ class TestStateManager:
             routing_decision=None,
             context={},
             error=None,
-            metadata={}
+            metadata={},
         )
 
         with pytest.raises(ValueError, match="must be a sequence"):

@@ -1,15 +1,14 @@
 """Test time utilities."""
 
-import pytest
-from datetime import datetime, date, timedelta
+from datetime import date, datetime
 
 from adhd_planner.utils.time_utils import (
-    time_string_to_datetime,
-    datetime_to_time_string,
     calculate_duration_minutes,
-    is_overlapping,
+    datetime_to_time_string,
     format_duration,
     get_next_occurrence,
+    is_overlapping,
+    time_string_to_datetime,
 )
 
 

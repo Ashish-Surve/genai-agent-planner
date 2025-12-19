@@ -4,9 +4,9 @@ from datetime import date, datetime, timedelta
 
 from sqlalchemy.orm import Session, joinedload
 
-from src.adhd_planner.utils.logger import get_logger
-from src.database.schema import TimeBlockModel
-from src.repositories.base_repository import BaseRepository
+from adhd_planner.database.schema import TimeBlockModel
+from adhd_planner.repositories.base_repository import BaseRepository
+from adhd_planner.utils.logger import get_logger
 
 logger = get_logger("time_block_repository")
 
@@ -128,7 +128,7 @@ class TimeBlockRepository(BaseRepository[TimeBlockModel]):
         try:
             blocks = (
                 self.session.query(self.model)
-                .filter(self.model.is_flexible == True)
+                .filter(self.model.is_flexible)
                 .order_by(self.model.start_time.asc())
                 .all()
             )
@@ -167,9 +167,7 @@ class TimeBlockRepository(BaseRepository[TimeBlockModel]):
         try:
             blocks = (
                 self.session.query(self.model)
-                .filter(
-                    self.model.sync_enabled == True, self.model.apple_calendar_event_id.is_(None)
-                )
+                .filter(self.model.sync_enabled, self.model.apple_calendar_event_id.is_(None))
                 .all()
             )
 

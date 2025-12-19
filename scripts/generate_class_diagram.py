@@ -21,12 +21,19 @@ Output:
     - diagrams/er_diagram.png
 """
 
-from graphviz import Digraph
 from pathlib import Path
 
+from graphviz import Digraph
 
-def create_class_node(graph: Digraph, name: str, attributes: list[str], methods: list[str],
-                      stereotype: str = None, fillcolor: str = "#FEFECE") -> None:
+
+def create_class_node(
+    graph: Digraph,
+    name: str,
+    attributes: list[str],
+    methods: list[str],
+    stereotype: str = None,
+    fillcolor: str = "#FEFECE",
+) -> None:
     """Create a UML class node with attributes and methods."""
     # Build the label using HTML-like syntax for record shape
     stereotype_row = f"«{stereotype}»\\n" if stereotype else ""
@@ -50,7 +57,9 @@ def create_class_node(graph: Digraph, name: str, attributes: list[str], methods:
     graph.node(name, label=label, shape="record", style="filled", fillcolor=fillcolor)
 
 
-def create_enum_node(graph: Digraph, name: str, values: list[str], fillcolor: str = "#DDFFDD") -> None:
+def create_enum_node(
+    graph: Digraph, name: str, values: list[str], fillcolor: str = "#DDFFDD"
+) -> None:
     """Create a UML enumeration node."""
     values_section = "\\l".join(values) + "\\l" if values else ""
     label = f"{{«enum»\\n{name}|{values_section}}}"
@@ -67,7 +76,12 @@ def generate_class_diagram() -> Digraph:
     dot.attr("edge", fontname="Helvetica", fontsize="9")
 
     # Title
-    dot.attr(label="ADHD-Planner - UML Class Diagram", labelloc="t", fontsize="16", fontname="Helvetica-Bold")
+    dot.attr(
+        label="ADHD-Planner - UML Class Diagram",
+        labelloc="t",
+        fontsize="16",
+        fontname="Helvetica-Bold",
+    )
 
     # ====================
     # ENUMERATIONS
@@ -87,46 +101,88 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_models") as c:
         c.attr(label="Data Models (Pydantic)", style="dashed", color="orange")
 
-        create_class_node(c, "BaseAppModel",
+        create_class_node(
+            c,
+            "BaseAppModel",
             ["+model_config: ConfigDict"],
             [],
             stereotype="abstract",
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
-        create_class_node(c, "TimestampedModel",
+        create_class_node(
+            c,
+            "TimestampedModel",
             ["+created_at: datetime", "+updated_at: datetime"],
             ["+mark_updated()"],
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
-        create_class_node(c, "Task",
-            ["+id: str", "+title: str", "+description: str",
-             "+estimated_duration_minutes: int", "+deadline: datetime",
-             "+status: TaskStatus", "+priority: Priority",
-             "+estimated_energy_level: EnergyLevel", "+requires_focus: bool",
-             "+tags: list[str]"],
+        create_class_node(
+            c,
+            "Task",
+            [
+                "+id: str",
+                "+title: str",
+                "+description: str",
+                "+estimated_duration_minutes: int",
+                "+deadline: datetime",
+                "+status: TaskStatus",
+                "+priority: Priority",
+                "+estimated_energy_level: EnergyLevel",
+                "+requires_focus: bool",
+                "+tags: list[str]",
+            ],
             ["+is_overdue: bool", "+is_completed: bool"],
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
-        create_class_node(c, "TimeBlock",
-            ["+id: str", "+task_id: str", "+start_time: datetime",
-             "+end_time: datetime", "+duration_minutes: int",
-             "+block_type: BlockType", "+is_flexible: bool"],
+        create_class_node(
+            c,
+            "TimeBlock",
+            [
+                "+id: str",
+                "+task_id: str",
+                "+start_time: datetime",
+                "+end_time: datetime",
+                "+duration_minutes: int",
+                "+block_type: BlockType",
+                "+is_flexible: bool",
+            ],
             ["+is_past: bool", "+is_current: bool"],
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
-        create_class_node(c, "CalendarEvent",
-            ["+id: str", "+title: str", "+start_time: datetime",
-             "+end_time: datetime", "+source: EventSource",
-             "+is_all_day: bool", "+related_task_id: str"],
+        create_class_node(
+            c,
+            "CalendarEvent",
+            [
+                "+id: str",
+                "+title: str",
+                "+start_time: datetime",
+                "+end_time: datetime",
+                "+source: EventSource",
+                "+is_all_day: bool",
+                "+related_task_id: str",
+            ],
             [],
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
-        create_class_node(c, "UserPreferences",
-            ["+user_id: str", "+typical_work_start: str",
-             "+typical_work_end: str", "+max_focus_duration: int",
-             "+llm_provider: str", "+model_name: str"],
+        create_class_node(
+            c,
+            "UserPreferences",
+            [
+                "+user_id: str",
+                "+typical_work_start: str",
+                "+typical_work_end: str",
+                "+max_focus_duration: int",
+                "+llm_provider: str",
+                "+model_name: str",
+            ],
             [],
-            fillcolor="#FFE4B5")
+            fillcolor="#FFE4B5",
+        )
 
     # ====================
     # ORM MODELS
@@ -134,26 +190,44 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_orm") as c:
         c.attr(label="Database ORM (SQLAlchemy)", style="dashed", color="purple")
 
-        create_class_node(c, "TaskModel",
-            ["+id: Column[String]", "+title: Column[String]",
-             "+status: Column[String]", "+priority: Column[String]",
-             "+time_blocks: relationship", "+sync_operations: relationship"],
+        create_class_node(
+            c,
+            "TaskModel",
+            [
+                "+id: Column[String]",
+                "+title: Column[String]",
+                "+status: Column[String]",
+                "+priority: Column[String]",
+                "+time_blocks: relationship",
+                "+sync_operations: relationship",
+            ],
             [],
             stereotype="Entity",
-            fillcolor="#E6E6FA")
+            fillcolor="#E6E6FA",
+        )
 
-        create_class_node(c, "TimeBlockModel",
-            ["+id: Column[String]", "+task_id: Column[String] «FK»",
-             "+start_time: Column[DateTime]", "+end_time: Column[DateTime]",
-             "+task: relationship"],
+        create_class_node(
+            c,
+            "TimeBlockModel",
+            [
+                "+id: Column[String]",
+                "+task_id: Column[String] «FK»",
+                "+start_time: Column[DateTime]",
+                "+end_time: Column[DateTime]",
+                "+task: relationship",
+            ],
             [],
             stereotype="Entity",
-            fillcolor="#E6E6FA")
+            fillcolor="#E6E6FA",
+        )
 
-        create_class_node(c, "DatabaseManager",
+        create_class_node(
+            c,
+            "DatabaseManager",
             ["-settings: Settings", "-engine: Engine", "-session_factory: sessionmaker"],
             ["+get_session(): Session", "+create_tables()", "+drop_tables()"],
-            fillcolor="#E6E6FA")
+            fillcolor="#E6E6FA",
+        )
 
     # ====================
     # REPOSITORIES
@@ -161,24 +235,50 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_repos") as c:
         c.attr(label="Repository Layer", style="dashed", color="coral")
 
-        create_class_node(c, "BaseRepository",
+        create_class_node(
+            c,
+            "BaseRepository",
             ["#model: Type[T]", "#session: Session"],
-            ["+create(data): T", "+get_by_id(id): T", "+get_all(): list[T]",
-             "+update(id, data): T", "+delete(id): bool", "+find_by_filters(): list[T]"],
+            [
+                "+create(data): T",
+                "+get_by_id(id): T",
+                "+get_all(): list[T]",
+                "+update(id, data): T",
+                "+delete(id): bool",
+                "+find_by_filters(): list[T]",
+            ],
             stereotype="Generic[T]",
-            fillcolor="#FFDAB9")
+            fillcolor="#FFDAB9",
+        )
 
-        create_class_node(c, "TaskRepository",
+        create_class_node(
+            c,
+            "TaskRepository",
             [],
-            ["+find_by_status()", "+find_overdue()", "+find_by_priority()",
-             "+find_by_energy_level()", "+search_by_title()", "+get_statistics()"],
-            fillcolor="#FFDAB9")
+            [
+                "+find_by_status()",
+                "+find_overdue()",
+                "+find_by_priority()",
+                "+find_by_energy_level()",
+                "+search_by_title()",
+                "+get_statistics()",
+            ],
+            fillcolor="#FFDAB9",
+        )
 
-        create_class_node(c, "TimeBlockRepository",
+        create_class_node(
+            c,
+            "TimeBlockRepository",
             [],
-            ["+find_by_date()", "+find_by_date_range()", "+find_conflicts()",
-             "+find_by_task()", "+get_day_statistics()"],
-            fillcolor="#FFDAB9")
+            [
+                "+find_by_date()",
+                "+find_by_date_range()",
+                "+find_conflicts()",
+                "+find_by_task()",
+                "+get_day_statistics()",
+            ],
+            fillcolor="#FFDAB9",
+        )
 
     # ====================
     # SERVICES
@@ -186,32 +286,57 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_services") as c:
         c.attr(label="Service Layer", style="dashed", color="blue")
 
-        create_class_node(c, "TaskService",
+        create_class_node(
+            c,
+            "TaskService",
             ["-repository: TaskRepository", "-calendar_service: CalendarService"],
-            ["+create_task()", "+update_task()", "+start_task()",
-             "+complete_task()", "+delete_task()", "+list_tasks()"],
-            fillcolor="#B0E0E6")
+            [
+                "+create_task()",
+                "+update_task()",
+                "+start_task()",
+                "+complete_task()",
+                "+delete_task()",
+                "+list_tasks()",
+            ],
+            fillcolor="#B0E0E6",
+        )
 
-        create_class_node(c, "CalendarService",
+        create_class_node(
+            c,
+            "CalendarService",
             ["-repository: TimeBlockRepository"],
-            ["+create_time_block()", "+find_available_slots()",
-             "+find_conflicts()", "+get_schedule_summary()"],
-            fillcolor="#B0E0E6")
+            [
+                "+create_time_block()",
+                "+find_available_slots()",
+                "+find_conflicts()",
+                "+get_schedule_summary()",
+            ],
+            fillcolor="#B0E0E6",
+        )
 
-        create_class_node(c, "TimeEstimationService",
+        create_class_node(
+            c,
+            "TimeEstimationService",
             ["-task_repository: TaskRepository", "-llm_service: LLMService"],
             ["+estimate_duration(): TimeEstimate", "+calculate_estimation_accuracy()"],
-            fillcolor="#B0E0E6")
+            fillcolor="#B0E0E6",
+        )
 
-        create_class_node(c, "LLMService",
+        create_class_node(
+            c,
+            "LLMService",
             ["-provider: BaseLLMProvider"],
             ["+generate(prompt): str", "+generate_with_metadata(): LLMResponse"],
-            fillcolor="#B0E0E6")
+            fillcolor="#B0E0E6",
+        )
 
-        create_class_node(c, "SettingsManager",
+        create_class_node(
+            c,
+            "SettingsManager",
             ["-settings_path: Path", "-_user_settings: dict"],
             ["+get(key)", "+set(key, value)", "+save()", "+reload()"],
-            fillcolor="#B0E0E6")
+            fillcolor="#B0E0E6",
+        )
 
     # ====================
     # LLM PROVIDERS
@@ -219,26 +344,38 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_llm") as c:
         c.attr(label="LLM Integration", style="dashed", color="pink")
 
-        create_class_node(c, "BaseLLMProvider",
+        create_class_node(
+            c,
+            "BaseLLMProvider",
             ["#model_name: str", "#temperature: float"],
             ["+generate(): LLMResponse", "+is_available(): bool"],
             stereotype="abstract",
-            fillcolor="#FFB6C1")
+            fillcolor="#FFB6C1",
+        )
 
-        create_class_node(c, "OllamaProvider",
+        create_class_node(
+            c,
+            "OllamaProvider",
             ["-base_url: str"],
             ["+generate()", "+is_available()"],
-            fillcolor="#FFB6C1")
+            fillcolor="#FFB6C1",
+        )
 
-        create_class_node(c, "GeminiProvider",
+        create_class_node(
+            c,
+            "GeminiProvider",
             ["-api_key: str"],
             ["+generate()", "+is_available()"],
-            fillcolor="#FFB6C1")
+            fillcolor="#FFB6C1",
+        )
 
-        create_class_node(c, "AnthropicProvider",
+        create_class_node(
+            c,
+            "AnthropicProvider",
             ["-api_key: str"],
             ["+generate()", "+is_available()"],
-            fillcolor="#FFB6C1")
+            fillcolor="#FFB6C1",
+        )
 
     # ====================
     # AGENTS
@@ -246,32 +383,50 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_agents") as c:
         c.attr(label="Multi-Agent System", style="dashed", color="magenta")
 
-        create_class_node(c, "BaseAgent",
+        create_class_node(
+            c,
+            "BaseAgent",
             ["#name: str", "#services: dict", "#state_manager: StateManager"],
             ["+execute(state): AgentState", "#handle_error()", "#add_response()"],
             stereotype="abstract",
-            fillcolor="#DDA0DD")
+            fillcolor="#DDA0DD",
+        )
 
-        create_class_node(c, "SupervisorAgent",
+        create_class_node(
+            c,
+            "SupervisorAgent",
             ["-llm_service: LLMService"],
             ["+execute(state)", "-_classify_and_route()"],
-            fillcolor="#DDA0DD")
+            fillcolor="#DDA0DD",
+        )
 
-        create_class_node(c, "PlanningAgent",
+        create_class_node(
+            c,
+            "PlanningAgent",
             ["-llm_service: LLMService", "-task_service: TaskService"],
             ["+execute(state)", "-_extract_intent_and_data()", "-_create_task()"],
-            fillcolor="#DDA0DD")
+            fillcolor="#DDA0DD",
+        )
 
-        create_class_node(c, "SchedulingAgent",
-            ["-llm_service: LLMService", "-task_service: TaskService",
-             "-calendar_service: CalendarService"],
+        create_class_node(
+            c,
+            "SchedulingAgent",
+            [
+                "-llm_service: LLMService",
+                "-task_service: TaskService",
+                "-calendar_service: CalendarService",
+            ],
             ["+execute(state)", "-_generate_schedule_suggestions()"],
-            fillcolor="#DDA0DD")
+            fillcolor="#DDA0DD",
+        )
 
-        create_class_node(c, "SuggestionAgent",
+        create_class_node(
+            c,
+            "SuggestionAgent",
             ["-llm_service: LLMService", "-task_service: TaskService"],
             ["+execute(state)", "-_get_task_suggestions()"],
-            fillcolor="#DDA0DD")
+            fillcolor="#DDA0DD",
+        )
 
     # ====================
     # LANGGRAPH
@@ -279,31 +434,58 @@ def generate_class_diagram() -> Digraph:
     with dot.subgraph(name="cluster_graph") as c:
         c.attr(label="LangGraph System", style="dashed", color="gold")
 
-        create_class_node(c, "AgentState",
-            ["+messages: Sequence[BaseMessage]", "+user_input: str",
-             "+current_agent: str", "+routing_decision: str",
-             "+context: dict", "+error: str"],
+        create_class_node(
+            c,
+            "AgentState",
+            [
+                "+messages: Sequence[BaseMessage]",
+                "+user_input: str",
+                "+current_agent: str",
+                "+routing_decision: str",
+                "+context: dict",
+                "+error: str",
+            ],
             [],
             stereotype="TypedDict",
-            fillcolor="#FFFACD")
+            fillcolor="#FFFACD",
+        )
 
-        create_class_node(c, "StateManager",
+        create_class_node(
+            c,
+            "StateManager",
             [],
-            ["+create_initial_state()", "+add_message()", "+set_routing_decision()",
-             "+update_context()", "+validate_state()"],
+            [
+                "+create_initial_state()",
+                "+add_message()",
+                "+set_routing_decision()",
+                "+update_context()",
+                "+validate_state()",
+            ],
             stereotype="static",
-            fillcolor="#FFFACD")
+            fillcolor="#FFFACD",
+        )
 
-        create_class_node(c, "GraphBuilder",
-            ["-llm_service", "-task_service", "-calendar_service",
-             "-agents_dict: dict", "-compiled_graph"],
+        create_class_node(
+            c,
+            "GraphBuilder",
+            [
+                "-llm_service",
+                "-task_service",
+                "-calendar_service",
+                "-agents_dict: dict",
+                "-compiled_graph",
+            ],
             ["+build_graph(): CompiledGraph", "+invoke(user_input): dict"],
-            fillcolor="#FFFACD")
+            fillcolor="#FFFACD",
+        )
 
-        create_class_node(c, "ChatHandler",
+        create_class_node(
+            c,
+            "ChatHandler",
             ["-graph: CompiledGraph"],
             ["+process_message(input, context): str", "+stream_response()"],
-            fillcolor="#FFFACD")
+            fillcolor="#FFFACD",
+        )
 
     # ====================
     # RELATIONSHIPS
@@ -337,7 +519,9 @@ def generate_class_diagram() -> Digraph:
 
     # Uses/Dependencies (dashed arrow)
     dot.edge("TaskRepository", "TaskModel", style="dashed", arrowhead="vee", label="manages")
-    dot.edge("TimeBlockRepository", "TimeBlockModel", style="dashed", arrowhead="vee", label="manages")
+    dot.edge(
+        "TimeBlockRepository", "TimeBlockModel", style="dashed", arrowhead="vee", label="manages"
+    )
 
     dot.edge("GraphBuilder", "SupervisorAgent", style="dashed", arrowhead="vee", label="creates")
     dot.edge("GraphBuilder", "PlanningAgent", style="dashed", arrowhead="vee", label="creates")
@@ -375,7 +559,12 @@ def generate_component_diagram() -> Digraph:
     dot.attr(rankdir="TB", splines="spline", nodesep="0.8", ranksep="1.2")
     dot.attr("node", fontname="Helvetica", fontsize="11", shape="component")
     dot.attr("edge", fontname="Helvetica", fontsize="9")
-    dot.attr(label="ADHD-Planner - Component Architecture", labelloc="t", fontsize="16", fontname="Helvetica-Bold")
+    dot.attr(
+        label="ADHD-Planner - Component Architecture",
+        labelloc="t",
+        fontsize="16",
+        fontname="Helvetica-Bold",
+    )
 
     # Presentation Layer
     with dot.subgraph(name="cluster_presentation") as c:
@@ -462,81 +651,121 @@ def generate_er_diagram() -> Digraph:
     dot.attr(rankdir="LR", splines="spline", nodesep="0.5", ranksep="1.5")
     dot.attr("node", fontname="Helvetica", fontsize="10")
     dot.attr("edge", fontname="Helvetica", fontsize="9")
-    dot.attr(label="ADHD-Planner - Entity Relationship Diagram", labelloc="t", fontsize="16", fontname="Helvetica-Bold")
+    dot.attr(
+        label="ADHD-Planner - Entity Relationship Diagram",
+        labelloc="t",
+        fontsize="16",
+        fontname="Helvetica-Bold",
+    )
 
     # Entity nodes using record shape
-    dot.node("tasks",
+    dot.node(
+        "tasks",
         label="{tasks|id: VARCHAR(36) «PK»\\l|title: VARCHAR(200)\\l"
-              "description: TEXT\\l"
-              "estimated_duration_minutes: INT\\l"
-              "deadline: DATETIME\\l"
-              "status: VARCHAR(20)\\l"
-              "priority: VARCHAR(10)\\l"
-              "tags: JSON\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#B0E0E6")
+        "description: TEXT\\l"
+        "estimated_duration_minutes: INT\\l"
+        "deadline: DATETIME\\l"
+        "status: VARCHAR(20)\\l"
+        "priority: VARCHAR(10)\\l"
+        "tags: JSON\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#B0E0E6",
+    )
 
-    dot.node("time_blocks",
+    dot.node(
+        "time_blocks",
         label="{time_blocks|id: VARCHAR(36) «PK»\\l"
-              "task_id: VARCHAR(36) «FK»\\l|"
-              "start_time: DATETIME\\l"
-              "end_time: DATETIME\\l"
-              "duration_minutes: INT\\l"
-              "block_type: VARCHAR(10)\\l"
-              "is_flexible: BOOLEAN\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#FFE4B5")
+        "task_id: VARCHAR(36) «FK»\\l|"
+        "start_time: DATETIME\\l"
+        "end_time: DATETIME\\l"
+        "duration_minutes: INT\\l"
+        "block_type: VARCHAR(10)\\l"
+        "is_flexible: BOOLEAN\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#FFE4B5",
+    )
 
-    dot.node("calendar_events",
+    dot.node(
+        "calendar_events",
         label="{calendar_events|id: VARCHAR(36) «PK»\\l"
-              "related_task_id: VARCHAR(36) «FK»\\l|"
-              "title: VARCHAR(200)\\l"
-              "start_time: DATETIME\\l"
-              "end_time: DATETIME\\l"
-              "source: VARCHAR(20)\\l"
-              "is_all_day: BOOLEAN\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#DDA0DD")
+        "related_task_id: VARCHAR(36) «FK»\\l|"
+        "title: VARCHAR(200)\\l"
+        "start_time: DATETIME\\l"
+        "end_time: DATETIME\\l"
+        "source: VARCHAR(20)\\l"
+        "is_all_day: BOOLEAN\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#DDA0DD",
+    )
 
-    dot.node("user_preferences",
+    dot.node(
+        "user_preferences",
         label="{user_preferences|id: VARCHAR(36) «PK»\\l|"
-              "user_id: VARCHAR(100)\\l"
-              "typical_work_start: VARCHAR(5)\\l"
-              "typical_work_end: VARCHAR(5)\\l"
-              "max_focus_duration: INT\\l"
-              "llm_provider: VARCHAR(20)\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#98FB98")
+        "user_id: VARCHAR(100)\\l"
+        "typical_work_start: VARCHAR(5)\\l"
+        "typical_work_end: VARCHAR(5)\\l"
+        "max_focus_duration: INT\\l"
+        "llm_provider: VARCHAR(20)\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#98FB98",
+    )
 
-    dot.node("energy_logs",
+    dot.node(
+        "energy_logs",
         label="{energy_logs|id: VARCHAR(36) «PK»\\l|"
-              "timestamp: DATETIME\\l"
-              "reported_energy: VARCHAR(10)\\l"
-              "predicted_energy: VARCHAR(10)\\l"
-              "tasks_completed: INT\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#F0E68C")
+        "timestamp: DATETIME\\l"
+        "reported_energy: VARCHAR(10)\\l"
+        "predicted_energy: VARCHAR(10)\\l"
+        "tasks_completed: INT\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#F0E68C",
+    )
 
-    dot.node("sync_operations",
+    dot.node(
+        "sync_operations",
         label="{sync_operations|id: VARCHAR(36) «PK»\\l"
-              "task_id: VARCHAR(36) «FK»\\l|"
-              "operation_type: VARCHAR(10)\\l"
-              "direction: VARCHAR(20)\\l"
-              "status: VARCHAR(20)\\l"
-              "error_message: TEXT\\l"
-              "...\\l}",
-        shape="record", style="filled", fillcolor="#FFB6C1")
+        "task_id: VARCHAR(36) «FK»\\l|"
+        "operation_type: VARCHAR(10)\\l"
+        "direction: VARCHAR(20)\\l"
+        "status: VARCHAR(20)\\l"
+        "error_message: TEXT\\l"
+        "...\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#FFB6C1",
+    )
 
-    dot.node("task_dependencies",
+    dot.node(
+        "task_dependencies",
         label="{task_dependencies|task_id: VARCHAR(36) «PK,FK»\\l"
-              "depends_on_id: VARCHAR(36) «PK,FK»\\l}",
-        shape="record", style="filled", fillcolor="#E6E6FA")
+        "depends_on_id: VARCHAR(36) «PK,FK»\\l}",
+        shape="record",
+        style="filled",
+        fillcolor="#E6E6FA",
+    )
 
     # Relationships with crow's foot notation approximation
     dot.edge("tasks", "time_blocks", label="1:N", arrowhead="crow", arrowtail="tee", dir="both")
     dot.edge("tasks", "calendar_events", label="1:N", arrowhead="crow", arrowtail="tee", dir="both")
     dot.edge("tasks", "sync_operations", label="1:N", arrowhead="crow", arrowtail="tee", dir="both")
-    dot.edge("tasks", "task_dependencies", label="N:M\\n(self-ref)", arrowhead="crow", arrowtail="crow", dir="both")
+    dot.edge(
+        "tasks",
+        "task_dependencies",
+        label="N:M\\n(self-ref)",
+        arrowhead="crow",
+        arrowtail="crow",
+        dir="both",
+    )
 
     return dot
 

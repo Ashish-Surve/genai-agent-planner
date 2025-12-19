@@ -9,6 +9,31 @@ from adhd_planner.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
+def build_graph():
+    """
+    Build and return the compiled LangGraph.
+
+    This is a convenience function for simple graph building.
+    For more control, use GraphBuilder directly.
+    """
+    from adhd_planner.database.connection import get_db
+    from adhd_planner.services.calendar_service import CalendarService
+    from adhd_planner.services.llm_service import get_llm_service
+    from adhd_planner.services.task_service import TaskService
+
+    # Initialize services
+    llm_service = get_llm_service()
+    db = get_db()
+    session = db.session_factory()
+
+    task_service = TaskService(session)
+    calendar_service = CalendarService(session)
+
+    # Build graph
+    builder = GraphBuilder(llm_service, task_service, calendar_service)
+    return builder.build_graph()
+
+
 class GraphBuilder:
     """Builds and manages the LangGraph workflow."""
 

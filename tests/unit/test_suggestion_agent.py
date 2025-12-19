@@ -1,11 +1,12 @@
 """Tests for Suggestion Agent."""
 
+from unittest.mock import MagicMock, Mock
+
 import pytest
-from unittest.mock import Mock, MagicMock
+from models.enums import EnergyLevel, Priority
 
 from adhd_planner.agents.suggestion_agent import SuggestionAgent
 from adhd_planner.graph.state_utils import StateManager
-from models.enums import Priority, EnergyLevel
 
 
 class TestSuggestionAgent:
@@ -72,9 +73,7 @@ class TestSuggestionAgent:
 
     def test_error_handling(self, suggestion_agent, mock_services):
         """Test error handling."""
-        mock_services["task_service"].get_incomplete_tasks.side_effect = Exception(
-            "Service error"
-        )
+        mock_services["task_service"].get_incomplete_tasks.side_effect = Exception("Service error")
 
         state = StateManager.create_initial_state("What should I work on?")
         result = suggestion_agent.execute(state)

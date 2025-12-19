@@ -18,6 +18,7 @@ from adhd_planner.graph.state_utils import StateManager
 from adhd_planner.services.calendar_service import CalendarService
 from adhd_planner.services.llm_service import LLMService
 from adhd_planner.services.task_service import TaskService
+from adhd_planner.utils.validation import ValidationError
 
 
 @pytest.fixture
@@ -180,7 +181,7 @@ class TestTaskServiceIntegration:
     def test_get_tasks_by_status(self, task_service):
         """Test filtering tasks by status."""
         # Create tasks with different statuses
-        task1 = task_service.create_task(title="Not started")
+        task_service.create_task(title="Not started")
         task2 = task_service.create_task(title="To be started")
         task_service.start_task(task2.id)
 
@@ -209,11 +210,11 @@ class TestTaskServiceIntegration:
     def test_task_validation(self, task_service):
         """Test task service validation."""
         # Empty title should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             task_service.create_task(title="", estimated_duration_minutes=30)
 
         # Negative duration should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             task_service.create_task(title="Valid", estimated_duration_minutes=-30)
 
 
@@ -395,17 +396,17 @@ class TestAgentErrorHandling:
     def test_task_service_input_validation(self, task_service):
         """Test task service validates input properly."""
         # Empty title should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             task_service.create_task(title="", estimated_duration_minutes=30)
 
     def test_task_service_duration_validation(self, task_service):
         """Test task service validates duration."""
         # Negative duration should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             task_service.create_task(title="Test", estimated_duration_minutes=-30)
 
         # Zero duration should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             task_service.create_task(title="Test", estimated_duration_minutes=0)
 
     def test_calendar_service_time_validation(self, calendar_service):
@@ -414,7 +415,7 @@ class TestAgentErrorHandling:
         past = now - timedelta(hours=1)
 
         # End time before start time should fail
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             calendar_service.create_time_block(
                 start_time=now,
                 end_time=past,
@@ -527,13 +528,13 @@ class TestRealWorldScenarios:
 
                 # Skip lunch
                 if hour == 12:
-                    block = calendar_service.create_time_block(
+                    calendar_service.create_time_block(
                         start_time=start,
                         end_time=end,
                         block_type="BREAK",
                     )
                 else:
-                    block = calendar_service.create_time_block(
+                    calendar_service.create_time_block(
                         start_time=start,
                         end_time=end,
                         block_type="TASK",
@@ -559,7 +560,7 @@ class TestServiceInteraction:
 
         # Schedule it in calendar
         now = datetime.now().replace(hour=10, minute=0, second=0, microsecond=0)
-        block = calendar_service.create_time_block(
+        calendar_service.create_time_block(
             start_time=now,
             end_time=now + timedelta(minutes=120),
             task_id=task.id,
