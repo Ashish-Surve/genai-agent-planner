@@ -16,22 +16,67 @@ st.set_page_config(page_title="Calendar - ADHD Planner", page_icon="📅", layou
 SessionManager.initialize()
 
 
+def get_task_service():
+    """
+    Get task service instance with fresh session.
+
+    Note: We create a fresh session each time to ensure data synchronization
+    between pages (Calendar, Chat, Tasks).
+    """
+    try:
+        from adhd_planner.database.connection import get_db
+        from adhd_planner.services.task_service import TaskService
+
+        db = get_db()
+        session = db.session_factory()
+        return TaskService(session)
+    except Exception as e:
+        logger.warning(f"Could not initialize task service: {e}")
+        return None
+
+
 def get_calendar_service():
-    """Get calendar service instance."""
-    if "calendar_service" not in st.session_state:
-        try:
-            from adhd_planner.database.connection import get_session
-            from adhd_planner.repositories.time_block_repository import TimeBlockRepository
-            from adhd_planner.services.calendar_service import CalendarService
+    """
+    Get calendar service instance with fresh session.
 
-            session = get_session()
-            repo = TimeBlockRepository(session)
-            st.session_state["calendar_service"] = CalendarService(repo)
-        except Exception as e:
-            logger.warning(f"Could not initialize calendar service: {e}")
-            st.session_state["calendar_service"] = None
+    Note: We create a fresh session each time to ensure data synchronization
+    between pages (Calendar, Chat, Tasks).
+    """
+    try:
+        from adhd_planner.database.connection import get_db
+        from adhd_planner.services.calendar_service import CalendarService
 
-    return st.session_state.get("calendar_service")
+        db = get_db()
+        session = db.session_factory()
+        return CalendarService(session)
+    except Exception as e:
+        logger.warning(f"Could not initialize calendar service: {e}")
+        return None
+
+
+def _get_block_title(block) -> str:
+    """
+    Get display title for a time block.
+
+    Args:
+        block: TimeBlock instance
+
+    Returns:
+        Human-readable title for the block
+    """
+    # If block has notes, use them as title
+    if hasattr(block, "notes") and block.notes:
+        return block.notes
+
+    # If block is linked to a task, try to get task title
+    if hasattr(block, "task") and block.task:
+        return block.task.title
+
+    # Otherwise, use block type as title
+    block_type = (
+        block.block_type.value if hasattr(block.block_type, "value") else str(block.block_type)
+    )
+    return f"{block_type.title()} Block"
 
 
 def get_mock_time_blocks(selected_date: date) -> list[dict[str, Any]]:
@@ -120,34 +165,138 @@ def get_mock_time_blocks(selected_date: date) -> list[dict[str, Any]]:
         return []
 
 
-def load_time_blocks(selected_date: date) -> list[dict[str, Any]]:
-    """Load time blocks for a given date."""
-    service = get_calendar_service()
+def load_tasks_for_date(selected_date: date) -> list[dict[str, Any]]:
+    """
+    Load tasks with deadlines on the selected date.
 
-    if service is None:
-        return get_mock_time_blocks(selected_date)
+    Returns tasks as calendar items that don't have time blocks yet.
+    """
+    task_service = get_task_service()
+
+    if task_service is None:
+        return []
 
     try:
-        blocks = service.get_time_blocks_for_date(selected_date)
-        return [
-            {
-                "id": str(b.id),
-                "title": b.title,
-                "start_time": b.start_time.time()
-                if isinstance(b.start_time, datetime)
-                else b.start_time,
-                "end_time": b.end_time.time() if isinstance(b.end_time, datetime) else b.end_time,
-                "energy_level": b.energy_level.value
-                if hasattr(b.energy_level, "value")
-                else str(b.energy_level),
-                "task_id": str(b.task_id) if b.task_id else None,
-                "is_break": b.is_break if hasattr(b, "is_break") else False,
-            }
-            for b in blocks
-        ]
+        # Get all tasks
+        all_tasks = task_service.list_tasks()
+
+        # Filter tasks with deadline on selected date
+        tasks_for_date = []
+        for task in all_tasks:
+            if hasattr(task, "deadline") and task.deadline:
+                # Check if deadline is on selected date
+                task_date = (
+                    task.deadline.date() if isinstance(task.deadline, datetime) else task.deadline
+                )
+                if task_date == selected_date:
+                    # Convert task to calendar item format
+                    # Tasks without time blocks show as all-day events
+
+                    # Get energy level - handle both enum and string
+                    energy = "medium"
+                    if hasattr(task, "estimated_energy_level") and task.estimated_energy_level:
+                        if hasattr(task.estimated_energy_level, "value"):
+                            energy = task.estimated_energy_level.value.lower()
+                        else:
+                            energy = str(task.estimated_energy_level).lower()
+
+                    # Get priority - handle both enum and string
+                    priority = "MEDIUM"
+                    if hasattr(task, "priority") and task.priority:
+                        if hasattr(task.priority, "value"):
+                            priority = task.priority.value
+                        else:
+                            priority = str(task.priority)
+
+                    # Get status - handle both enum and string
+                    status = "NOT_STARTED"
+                    if hasattr(task, "status") and task.status:
+                        if hasattr(task.status, "value"):
+                            status = task.status.value
+                        else:
+                            status = str(task.status)
+
+                    tasks_for_date.append(
+                        {
+                            "id": f"task_{task.id}",
+                            "title": f"📌 {task.title}",  # Prefix to indicate it's a task
+                            "start_time": time(0, 0),  # All-day event
+                            "end_time": time(23, 59),
+                            "energy_level": energy,
+                            "task_id": str(task.id),
+                            "is_break": False,
+                            "is_task_deadline": True,  # Flag to identify task deadlines
+                            "priority": priority,
+                            "status": status,
+                        }
+                    )
+
+        return tasks_for_date
+
     except Exception as e:
-        logger.error(f"Error loading time blocks: {e}")
+        logger.error(f"Error loading tasks for date: {e}")
+        return []
+
+
+def load_time_blocks(selected_date: date) -> list[dict[str, Any]]:
+    """
+    Load time blocks and tasks for a given date.
+
+    Combines:
+    1. Scheduled time blocks
+    2. Tasks with deadlines (that don't have time blocks yet)
+    """
+    calendar_service = get_calendar_service()
+
+    # Start with scheduled time blocks
+    time_blocks = []
+
+    if calendar_service is not None:
+        try:
+            blocks = calendar_service.get_blocks_for_date(selected_date)
+            time_blocks = [
+                {
+                    "id": str(b.id),
+                    "title": _get_block_title(b),
+                    "start_time": b.start_time.time()
+                    if isinstance(b.start_time, datetime)
+                    else b.start_time,
+                    "end_time": b.end_time.time()
+                    if isinstance(b.end_time, datetime)
+                    else b.end_time,
+                    "energy_level": (
+                        b.energy_level_required.value
+                        if hasattr(b, "energy_level_required") and b.energy_level_required
+                        else "medium"
+                    ),
+                    "task_id": str(b.task_id) if b.task_id else None,
+                    "is_break": b.block_type.value == "BREAK"
+                    if hasattr(b.block_type, "value")
+                    else b.block_type == "BREAK",
+                    "is_task_deadline": False,
+                }
+                for b in blocks
+            ]
+        except Exception as e:
+            logger.error(f"Error loading time blocks: {e}")
+
+    # Add tasks with deadlines (if they don't already have time blocks)
+    task_deadlines = load_tasks_for_date(selected_date)
+
+    # Get task IDs that already have time blocks
+    scheduled_task_ids = {str(b.get("task_id")) for b in time_blocks if b.get("task_id")}
+
+    # Only add tasks that don't have time blocks yet
+    for task_item in task_deadlines:
+        task_id = task_item.get("task_id")
+        if task_id not in scheduled_task_ids:
+            time_blocks.append(task_item)
+
+    # If no data available, use mock data
+    if not time_blocks and calendar_service is None:
         return get_mock_time_blocks(selected_date)
+
+    return time_blocks
 
 
 def calculate_stats(blocks: list[dict[str, Any]]) -> dict[str, Any]:
