@@ -215,6 +215,32 @@ Update this section as you complete stories:
 - **Hours Invested**: ~44 hours
 - **Estimated Remaining**: ~45 hours
 
+### Recent Bug Fixes
+
+#### ADHD-22: Fixed Chat and Tasks Page Synchronization (2024-12-24)
+
+**Issue**: Tasks created or modified in the Chat page were not reflected in the Tasks page and vice versa.
+
+**Root Causes Identified**:
+1. Incorrect database session management - Tasks page was importing non-existent `get_session()` function
+2. Parameter mismatch - Tasks page used `estimated_minutes` and `due_date` instead of correct `estimated_duration_minutes` and `deadline`
+3. Missing required `energy_level` parameter in task creation form
+4. Incorrect method call - used non-existent `get_all_tasks()` instead of `list_tasks()` or `get_incomplete_tasks()`
+5. Status value misalignment - UI used lowercase values while TaskService expects uppercase (NOT_STARTED, IN_PROGRESS, etc.)
+
+**Fixes Applied**:
+1. Updated database connection to use `get_db().session_factory()` pattern matching Chat page
+2. Fixed create_task call to use correct parameter names (`estimated_duration_minutes`, `deadline`, `energy_level`)
+3. Added energy_level selector to task creation form
+4. Updated load_tasks to use proper TaskService methods (`list_tasks()`, `get_incomplete_tasks()`)
+5. Aligned status and priority values with TaskService enums (URGENT/HIGH/MEDIUM/LOW, NOT_STARTED/IN_PROGRESS/COMPLETED/BLOCKED)
+
+**Files Modified**:
+- `src/adhd_planner/ui/pages/2_Tasks.py` - Fixed all API mismatches, database session handling, and removed st.rerun() from callbacks
+- `src/adhd_planner/ui/components/task_card.py` - Fixed attribute access for TaskModel (estimated_duration_minutes, deadline, priority, status)
+- `src/adhd_planner/agents/scheduling_agent.py` - Fixed .value attribute access on string fields
+- `src/adhd_planner/agents/suggestion_agent.py` - Fixed .value attribute access on string fields
+
 ## Getting Help
 
 If you get stuck on a story:

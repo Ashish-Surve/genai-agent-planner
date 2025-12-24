@@ -76,12 +76,13 @@ class SuggestionAgent(BaseAgent):
                 else:
                     urgency_score = 3
 
+            # TaskModel stores priority as string, not enum
             priority_score = {
-                "urgent": 10,
-                "high": 8,
-                "medium": 5,
-                "low": 2,
-            }.get(task.priority.value, 5)
+                "URGENT": 10,
+                "HIGH": 8,
+                "MEDIUM": 5,
+                "LOW": 2,
+            }.get(str(task.priority).upper(), 5)
 
             total_score = (urgency_score + priority_score) / 2
 
@@ -89,11 +90,11 @@ class SuggestionAgent(BaseAgent):
                 "task_id": task.id,
                 "task_title": task.title,
                 "duration": task.estimated_duration_minutes or 60,
-                "priority": task.priority.value,
+                "priority": str(task.priority),
                 "score": total_score,
-                "reason": f"Deadline soon and {task.priority.value} priority"
+                "reason": f"Deadline soon and {task.priority} priority"
                 if urgency_score > 5
-                else f"{task.priority.value} priority task",
+                else f"{task.priority} priority task",
             }
             suggestions.append(suggestion)
 

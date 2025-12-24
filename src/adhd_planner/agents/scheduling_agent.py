@@ -65,10 +65,11 @@ class SchedulingAgent(BaseAgent):
         suggestions = []
 
         # Sort by priority and deadline
+        # TaskModel stores priority and estimated_energy_level as strings, not enums
         sorted_tasks = sorted(
             tasks,
             key=lambda t: (
-                -{"urgent": 4, "high": 3, "medium": 2, "low": 1}.get(t.priority.value, 1),
+                -{"URGENT": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1}.get(str(t.priority).upper(), 1),
                 t.deadline or datetime.now() + timedelta(days=365),
             ),
         )
@@ -78,9 +79,9 @@ class SchedulingAgent(BaseAgent):
                 "task_id": task.id,
                 "task_title": task.title,
                 "duration": task.estimated_duration_minutes or 60,
-                "priority": task.priority.value,
+                "priority": str(task.priority),
                 "position": i + 1,
-                "reasoning": f"Priority: {task.priority.value}, Energy: {task.energy_level.value}",
+                "reasoning": f"Priority: {task.priority}, Energy: {task.estimated_energy_level}",
             }
             suggestions.append(suggestion)
 
