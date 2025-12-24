@@ -119,10 +119,19 @@ class SupervisorAgent(BaseAgent):
                 "direct_response",
             ]
 
-            if routing_decision["agent"] not in valid_agents:
+            agent_name = routing_decision["agent"]
+
+            # Handle pipe-separated agents (fallback safety)
+            if "|" in agent_name:
                 self.logger.warning(
-                    f"Invalid agent: {routing_decision['agent']}, defaulting to direct_response"
+                    f"LLM returned multiple agents: {agent_name}. Using first agent only."
                 )
+                agent_name = agent_name.split("|")[0].strip()
+                routing_decision["agent"] = agent_name
+
+            # Validate against valid agents list
+            if agent_name not in valid_agents:
+                self.logger.warning(f"Invalid agent: {agent_name}, defaulting to direct_response")
                 routing_decision["agent"] = "direct_response"
 
             return routing_decision
