@@ -48,3 +48,5 @@ def test_db_session(mock_settings, monkeypatch):
     # Clean up
     session.close()
     db.drop_tables()
+    # Dispose of the connection pool to prevent resource warnings
+    db.engine.dispose()
