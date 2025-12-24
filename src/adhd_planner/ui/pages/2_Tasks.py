@@ -19,10 +19,11 @@ def get_task_service():
     """Get task service instance."""
     if "task_service" not in st.session_state:
         try:
-            from adhd_planner.database.connection import get_session
+            from adhd_planner.database.connection import get_db
             from adhd_planner.services.task_service import TaskService
 
-            session = get_session()
+            db = get_db()
+            session = db.session_factory()
             st.session_state["task_service"] = TaskService(session)
         except Exception as e:
             logger.warning(f"Could not initialize task service: {e}")
@@ -70,26 +71,18 @@ def load_tasks(status_filter: str = "all", priority_filter: str = "all", sort_by
         tasks = get_mock_tasks()
     else:
         try:
-            tasks = service.get_all_tasks()
+            # Use list_tasks() method with appropriate filters
+            if status_filter != "all" or priority_filter != "all":
+                tasks = service.list_tasks(
+                    status=status_filter.upper() if status_filter != "all" else None,
+                    priority=priority_filter.upper() if priority_filter != "all" else None,
+                )
+            else:
+                # Get all incomplete tasks by default
+                tasks = service.get_incomplete_tasks()
         except Exception as e:
             logger.error(f"Error loading tasks: {e}")
             tasks = get_mock_tasks()
-
-    # Apply status filter
-    if status_filter != "all":
-        tasks = [
-            t
-            for t in tasks
-            if (t.get("status") if isinstance(t, dict) else t.status.value) == status_filter
-        ]
-
-    # Apply priority filter
-    if priority_filter != "all":
-        tasks = [
-            t
-            for t in tasks
-            if (t.get("priority") if isinstance(t, dict) else t.priority.value) == priority_filter
-        ]
 
     return tasks
 
@@ -102,10 +95,10 @@ def handle_complete_task(task_id: str):
     if service:
         try:
             service.complete_task(task_id)
+            # Store success message in session state to display after rerun
+            st.session_state["task_action_message"] = ("success", "Task completed!")
         except Exception as e:
-            st.error(f"Error completing task: {e}")
-
-    st.rerun()
+            st.session_state["task_action_message"] = ("error", f"Error completing task: {e}")
 
 
 def handle_delete_task(task_id: str):
@@ -116,10 +109,10 @@ def handle_delete_task(task_id: str):
     if service:
         try:
             service.delete_task(task_id)
+            # Store success message in session state to display after rerun
+            st.session_state["task_action_message"] = ("success", "Task deleted!")
         except Exception as e:
-            st.error(f"Error deleting task: {e}")
-
-    st.rerun()
+            st.session_state["task_action_message"] = ("error", f"Error deleting task: {e}")
 
 
 def add_task_form():
@@ -131,9 +124,14 @@ def add_task_form():
 
         col1, col2 = st.columns(2)
         with col1:
-            priority = st.selectbox("Priority", ["high", "medium", "low"], index=1)
+            priority = st.selectbox("Priority", ["URGENT", "HIGH", "MEDIUM", "LOW"], index=2)
         with col2:
+            energy_level = st.selectbox("Energy Level", ["LOW", "MEDIUM", "HIGH"], index=1)
+
+        col3, col4 = st.columns(2)
+        with col3:
             hours = st.number_input("Hours", min_value=0, max_value=8, value=1)
+        with col4:
             minutes = st.number_input("Minutes", min_value=0, max_value=59, value=0, step=15)
 
         due_date = st.date_input("Due Date (optional)", value=None)
@@ -145,7 +143,7 @@ def add_task_form():
                 st.error("Please enter a task title")
                 return
 
-            estimated_minutes = (hours * 60) + minutes
+            total_minutes = (hours * 60) + minutes
 
             service = get_task_service()
             if service:
@@ -153,8 +151,9 @@ def add_task_form():
                     service.create_task(
                         title=title,
                         priority=priority,
-                        estimated_minutes=estimated_minutes,
-                        due_date=datetime.combine(due_date, datetime.min.time())
+                        energy_level=energy_level,
+                        estimated_duration_minutes=total_minutes,
+                        deadline=datetime.combine(due_date, datetime.min.time())
                         if due_date
                         else None,
                     )
@@ -171,6 +170,15 @@ def main():
     """Main tasks page."""
     st.title("📋 Tasks")
 
+    # Display any action messages from callbacks
+    if "task_action_message" in st.session_state:
+        msg_type, msg_text = st.session_state["task_action_message"]
+        if msg_type == "success":
+            st.success(msg_text)
+        else:
+            st.error(msg_text)
+        del st.session_state["task_action_message"]
+
     # Sidebar with add task form
     with st.sidebar:
         add_task_form()
@@ -181,21 +189,21 @@ def main():
     with col1:
         status_filter = st.selectbox(
             "Status",
-            ["all", "pending", "in_progress", "completed"],
+            ["all", "not_started", "in_progress", "completed", "blocked"],
             format_func=lambda x: x.replace("_", " ").title() if x != "all" else "All",
         )
 
     with col2:
         priority_filter = st.selectbox(
             "Priority",
-            ["all", "high", "medium", "low"],
+            ["all", "urgent", "high", "medium", "low"],
             format_func=lambda x: x.title() if x != "all" else "All",
         )
 
     with col3:
         sort_by = st.selectbox(
             "Sort By",
-            ["created", "due_date", "priority"],
+            ["created", "deadline", "priority"],
             format_func=lambda x: x.replace("_", " ").title(),
         )
 
@@ -207,11 +215,7 @@ def main():
     # Summary
     total = len(tasks)
     completed = len(
-        [
-            t
-            for t in tasks
-            if (t.get("status") if isinstance(t, dict) else t.status.value) == "completed"
-        ]
+        [t for t in tasks if (t.get("status") if isinstance(t, dict) else t.status) == "COMPLETED"]
     )
 
     col1, col2, col3 = st.columns(3)

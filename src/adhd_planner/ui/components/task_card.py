@@ -29,15 +29,16 @@ def task_card(
         on_complete: Callback when task is completed
         on_delete: Callback when task is deleted
     """
-    # Priority colors
+    # Priority colors (case-insensitive)
     priority_colors = {
+        "urgent": "🔴",
         "high": "🔴",
         "medium": "🟡",
         "low": "🟢",
     }
 
-    # Status indicators
-    is_completed = status == "completed"
+    # Status indicators (handle both uppercase and lowercase)
+    is_completed = status.upper() == "COMPLETED"
 
     with st.container():
         col1, col2, col3 = st.columns([0.5, 8, 1.5])
@@ -118,15 +119,15 @@ def task_list(
                 on_delete=on_delete,
             )
         else:
+            # Handle TaskModel objects with correct attribute names
+            # TaskModel stores priority and status as strings, not enums
             task_card(
                 task_id=str(task.id),
                 title=task.title,
-                priority=task.priority.value
-                if hasattr(task.priority, "value")
-                else str(task.priority),
-                status=task.status.value if hasattr(task.status, "value") else str(task.status),
-                estimated_minutes=task.estimated_minutes,
-                due_date=task.due_date,
+                priority=str(task.priority),
+                status=str(task.status),
+                estimated_minutes=getattr(task, "estimated_duration_minutes", None),
+                due_date=getattr(task, "deadline", None),
                 on_complete=on_complete,
                 on_delete=on_delete,
             )
