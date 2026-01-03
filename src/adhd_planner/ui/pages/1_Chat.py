@@ -53,6 +53,9 @@ def main():
         st.markdown("### Chat Actions")
         if st.button("🗑️ Clear Chat", use_container_width=True):
             SessionManager.clear_messages()
+            # Also clear handler context for fresh conversation
+            handler = get_chat_handler()
+            handler.clear_context()
             st.rerun()
 
         st.markdown("---")

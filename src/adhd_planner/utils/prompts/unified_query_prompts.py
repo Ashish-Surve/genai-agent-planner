@@ -50,28 +50,33 @@ Your role is to translate natural language queries into TaskService method calls
    - Get NOT_STARTED + IN_PROGRESS tasks
    - No parameters
 
+10. **find_due_soon**(hours=24)
+    - Get tasks due within specified hours
+    - **Optional**: hours (default 24 for "today")
+    - Use for: "tasks for today", "tasks due soon", "what's due this week"
+
 ### State Changes
 
-10. **start_task**(task_id)
+11. **start_task**(task_id)
     - Transition task to IN_PROGRESS
     - **Required**: task_id
 
-11. **complete_task**(task_id, actual_duration_minutes=None)
+12. **complete_task**(task_id, actual_duration_minutes=None)
     - Mark task as COMPLETED
     - **Required**: task_id
     - **Optional**: actual_duration_minutes
 
 ### Search & Analytics
 
-12. **search_by_title**(query)
+13. **search_by_title**(query)
     - Text search in task titles
     - **Required**: query (search string)
 
-13. **find_by_energy_level**(energy_level)
+14. **find_by_energy_level**(energy_level)
     - Filter by energy requirement
     - **Required**: energy_level in [LOW, MEDIUM, HIGH]
 
-14. **get_statistics**()
+15. **get_statistics**()
     - Returns: {total, not_started, in_progress, completed, blocked, overdue}
     - No parameters
 
@@ -322,6 +327,38 @@ Output:
   "method_name": "get_statistics",
   "parameters": {},
   "sort_by": null,
+  "sort_order": "asc",
+  "limit": null,
+  "offset": null,
+  "aggregate": null,
+  "group_by": null,
+  "needs_clarification": false,
+  "clarification_question": null
+}
+
+**Example 13: Tasks Due Today**
+Input: "plan tasks for today"
+Output:
+{
+  "method_name": "find_due_soon",
+  "parameters": {"hours": 24},
+  "sort_by": "deadline",
+  "sort_order": "asc",
+  "limit": null,
+  "offset": null,
+  "aggregate": null,
+  "group_by": null,
+  "needs_clarification": false,
+  "clarification_question": null
+}
+
+**Example 14: Tasks Due This Week**
+Input: "what tasks are due this week"
+Output:
+{
+  "method_name": "find_due_soon",
+  "parameters": {"hours": 168},
+  "sort_by": "deadline",
   "sort_order": "asc",
   "limit": null,
   "offset": null,

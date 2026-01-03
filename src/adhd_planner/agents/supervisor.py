@@ -53,6 +53,13 @@ class SupervisorAgent(BaseAgent):
             # Get user input
             user_input = state["user_input"]
 
+            # Check for pending actions that require continuation
+            pending_agent = self._check_pending_actions(state)
+            if pending_agent:
+                state["routing_decision"] = pending_agent
+                self.logger.info(f"Routing to {pending_agent} for pending action continuation")
+                return state
+
             # Get conversation history for context
             conversation_history = self._get_conversation_context(state)
 
@@ -76,6 +83,31 @@ class SupervisorAgent(BaseAgent):
 
         except Exception as e:
             return self.handle_error(state, e)
+
+    def _check_pending_actions(self, state: AgentState) -> str | None:
+        """
+        Check if there are pending actions requiring continuation.
+
+        This enables multi-turn conversations where an agent awaits user confirmation.
+
+        Args:
+            state: Current agent state
+
+        Returns:
+            Agent name to route to, or None if no pending action
+        """
+        context = state.get("context", {})
+
+        # Check for pending schedule (scheduling_agent awaiting confirmation)
+        pending_schedule = context.get("pending_schedule")
+        if pending_schedule and pending_schedule.get("status") == "awaiting_confirmation":
+            self.logger.debug("Found pending schedule awaiting confirmation")
+            return "scheduling_agent"
+
+        # Add more pending action checks here as needed
+        # e.g., pending_task_creation, pending_sync, etc.
+
+        return None
 
     def _classify_and_route(self, user_input: str, conversation_history: str) -> dict[str, Any]:
         """

@@ -13,9 +13,10 @@ def time_block_card(
     energy_level: str = "medium",
     task_id: str | None = None,
     is_break: bool = False,
-) -> None:
+    on_click: callable | None = None,
+) -> bool:
     """
-    Display a time block card.
+    Display a time block card with optional click handling.
 
     Args:
         block_id: Unique block identifier
@@ -23,8 +24,12 @@ def time_block_card(
         start_time: Start time
         end_time: End time
         energy_level: Energy level (high, medium, low)
-        task_id: Associated task ID
+        task_id: Associated task ID (unused, kept for compatibility)
         is_break: Whether this is a break block
+        on_click: Callback when block is clicked (receives block_id)
+
+    Returns:
+        True if the block was clicked, False otherwise
     """
     # Energy level colors
     energy_colors = {
@@ -65,27 +70,42 @@ def time_block_card(
     else:
         duration_str = f"{duration_minutes}m"
 
-    # Render block
-    st.markdown(
-        f"""
-        <div style="
-            background-color: {bg_color};
-            border-radius: 8px;
-            padding: 12px;
-            margin: 4px 0;
-            border-left: 4px solid rgba(0,0,0,0.2);
-        ">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-weight: bold;">{icon} {title}</span>
-                <span style="font-size: 0.85em; color: #666;">{duration_str}</span>
-            </div>
-            <div style="font-size: 0.85em; color: #555; margin-top: 4px;">
-                {start_str} - {end_str}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    # Create a container for the block with edit button
+    clicked = False
+    with st.container():
+        col1, col2 = st.columns([9, 1])
+
+        with col1:
+            # Render block content
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: {bg_color};
+                    border-radius: 8px;
+                    padding: 12px;
+                    margin: 4px 0;
+                    border-left: 4px solid rgba(0,0,0,0.2);
+                ">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold;">{icon} {title}</span>
+                        <span style="font-size: 0.85em; color: #666;">{duration_str}</span>
+                    </div>
+                    <div style="font-size: 0.85em; color: #555; margin-top: 4px;">
+                        {start_str} - {end_str}
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+        with col2:
+            # Show edit button for all blocks (not just those with tasks)
+            if on_click and block_id:
+                if st.button("✏️", key=f"edit_block_{block_id}", help="Edit time block"):
+                    on_click(block_id)
+                    clicked = True
+
+    return clicked
 
 
 def empty_slot(start_time: time, end_time: time) -> None:

@@ -13,6 +13,7 @@ def day_timeline(
     time_blocks: list[dict[str, Any]],
     work_start: time = time(9, 0),
     work_end: time = time(17, 0),
+    on_block_click: callable | None = None,
 ) -> None:
     """
     Display a day timeline with time blocks.
@@ -22,6 +23,7 @@ def day_timeline(
         time_blocks: List of time block dicts
         work_start: Working hours start
         work_end: Working hours end
+        on_block_click: Callback when a time block is clicked (receives block_id)
     """
     st.markdown(f"### {selected_date.strftime('%A, %B %d, %Y')}")
 
@@ -56,6 +58,7 @@ def day_timeline(
             energy_level=block.get("energy_level", "medium"),
             task_id=block.get("task_id"),
             is_break=block.get("is_break", False),
+            on_click=on_block_click,
         )
 
 

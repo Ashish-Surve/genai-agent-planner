@@ -12,7 +12,8 @@ class ChatHandler:
     Handles chat interactions between UI and agent system.
 
     Processes user messages through the LangGraph agent system
-    and returns responses.
+    and returns responses. Persists context between turns for
+    multi-turn conversations.
     """
 
     def __init__(self, graph=None):
@@ -24,6 +25,8 @@ class ChatHandler:
         """
         self.graph = graph
         self._use_mock = graph is None
+        # Persistent context across conversation turns
+        self._persistent_context = {}
 
     def process_message(self, user_input: str, context: dict = None) -> str:
         """
@@ -42,8 +45,11 @@ class ChatHandler:
             return self._mock_response(user_input)
 
         try:
+            # Merge provided context with persistent context
+            merged_context = {**self._persistent_context, **(context or {})}
+
             # Run through agent graph
-            result = self._run_graph(user_input, context or {})
+            result = self._run_graph(user_input, merged_context)
             return result
         except Exception as e:
             logger.error(f"Error processing message: {e}")
@@ -54,12 +60,16 @@ class ChatHandler:
         try:
             from adhd_planner.graph.state_utils import StateManager
 
-            # Create initial state
+            # Create initial state with persistent context
             state = StateManager.create_initial_state(user_input)
             state["context"] = context
 
             # Run graph
             result = self.graph.invoke(state)
+
+            # Persist context from result for next turn
+            result_context = result.get("context", {})
+            self._update_persistent_context(result_context)
 
             # Extract response from last AI message
             messages = result.get("messages", [])
@@ -71,6 +81,33 @@ class ChatHandler:
         except Exception as e:
             logger.error(f"Error running graph: {e}")
             raise
+
+    def _update_persistent_context(self, new_context: dict) -> None:
+        """
+        Update persistent context with new values from graph execution.
+
+        Handles special cases like clearing pending actions.
+
+        Args:
+            new_context: Context dict from graph result
+        """
+        for key, value in new_context.items():
+            if value is None:
+                # None means explicitly clear this context
+                self._persistent_context.pop(key, None)
+                logger.debug(f"Cleared persistent context key: {key}")
+            else:
+                self._persistent_context[key] = value
+                logger.debug(f"Updated persistent context key: {key}")
+
+    def clear_context(self) -> None:
+        """Clear all persistent context (e.g., on conversation reset)."""
+        self._persistent_context = {}
+        logger.info("Cleared all persistent context")
+
+    def get_context(self) -> dict:
+        """Get current persistent context."""
+        return self._persistent_context.copy()
 
     def _mock_response(self, user_input: str) -> str:
         """Generate mock response for development/testing."""
