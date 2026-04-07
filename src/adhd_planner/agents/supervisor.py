@@ -98,10 +98,10 @@ class SupervisorAgent(BaseAgent):
         """
         context = state.get("context", {})
 
-        # Check for pending schedule (scheduling_agent awaiting confirmation)
-        pending_schedule = context.get("pending_schedule")
-        if pending_schedule and pending_schedule.get("status") == "awaiting_confirmation":
-            self.logger.debug("Found pending schedule awaiting confirmation")
+        # Check for pending task schedule (scheduling_agent awaiting confirmation/negotiation)
+        pending_task_schedule = context.get("pending_task_schedule")
+        if pending_task_schedule and pending_task_schedule.get("status") == "awaiting_confirmation":
+            self.logger.debug("Found pending task schedule awaiting confirmation")
             return "scheduling_agent"
 
         # Add more pending action checks here as needed

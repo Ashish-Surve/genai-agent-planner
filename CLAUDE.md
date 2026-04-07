@@ -18,8 +18,9 @@ When working on any Jira ticket, ALWAYS follow this Pull Request workflow:
 ### 2. Make Changes and Commit
 - Make your code changes on the feature branch
 - Update the `.jira/README.md` file to document what was completed
-- Stage and commit changes with proper commit messages (see format below)
+- Stage and commit changes with proper commit messages (see format below) after conforming from the user. 
 - NEVER commit directly to `dev` or `main` branches
+- NEVER `commit` or `push` without consent from user. 
 
 ### 3. Push the New Branch
 - Push your feature branch to the remote repository
@@ -47,7 +48,6 @@ Detailed explanation if needed (optional).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 Committed-By: Claude by Ashish
 ```
 
@@ -69,7 +69,6 @@ Implements drag-and-drop priority sorting for tasks with local storage persisten
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
-Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 Committed-By: Claude by Ashish
 ```
 

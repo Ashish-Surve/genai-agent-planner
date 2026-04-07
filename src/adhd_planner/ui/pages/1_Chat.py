@@ -5,8 +5,12 @@ import streamlit as st
 from adhd_planner.core.chat_handler import ChatHandler
 from adhd_planner.core.session_manager import SessionManager
 from adhd_planner.ui.components.chat_message import display_message, display_message_history
+from adhd_planner.ui.styles import apply_adhd_theme
 
 st.set_page_config(page_title="Chat - ADHD Planner", page_icon="💬", layout="wide")
+
+# Apply ADHD-friendly theme
+apply_adhd_theme()
 
 # Initialize session
 SessionManager.initialize()
