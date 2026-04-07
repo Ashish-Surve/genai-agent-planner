@@ -25,6 +25,7 @@ class MethodCallValidator:
         "search_by_title",
         "find_by_energy_level",
         "get_statistics",
+        "find_due_soon",
     }
 
     # Required parameters for each method
@@ -38,6 +39,51 @@ class MethodCallValidator:
         "search_by_title": ["query"],
         "find_by_energy_level": ["energy_level"],
         "get_tasks_by_status": ["status"],
+        "find_due_soon": [],
+    }
+
+    # Valid parameters for each method (prevents invalid kwargs errors)
+    VALID_PARAMS = {
+        "create_task": [
+            "title",
+            "description",
+            "estimated_duration_minutes",
+            "energy_level",
+            "priority",
+            "deadline",
+            "context_category",
+            "requires_focus",
+            "tags",
+            "dependency_ids",
+            "sync_enabled",
+        ],
+        "update_task": [
+            "task_id",
+            "task_identifier",
+            "title",
+            "description",
+            "priority",
+            "deadline",
+            "status",
+            "energy_level",
+            "context_category",
+            "requires_focus",
+            "tags",
+            "estimated_duration_minutes",
+        ],
+        "delete_task": ["task_id", "task_identifier"],
+        "get_task": ["task_id", "task_identifier"],
+        "list_tasks": ["status", "priority", "context_category", "tag", "overdue_only", "limit"],
+        "get_tasks_by_status": ["status"],
+        "get_overdue_tasks": [],
+        "get_tasks_ready_to_start": [],
+        "get_incomplete_tasks": [],
+        "start_task": ["task_id", "task_identifier"],
+        "complete_task": ["task_id", "task_identifier", "actual_duration_minutes"],
+        "search_by_title": ["query"],
+        "find_by_energy_level": ["energy_level"],
+        "get_statistics": [],
+        "find_due_soon": ["hours"],
     }
 
     # Valid enum values
@@ -79,12 +125,24 @@ class MethodCallValidator:
                 logger.warning(error)
                 return False, error
 
-        # 3. Validate enum values
+        # 3. Validate no invalid parameters are passed
+        valid_params = self.VALID_PARAMS.get(method_call.method_name, None)
+        if valid_params is not None:
+            for param in method_call.parameters:
+                if param not in valid_params:
+                    error = (
+                        f"Invalid parameter '{param}' for method '{method_call.method_name}'. "
+                        f"Valid parameters are: {', '.join(valid_params) if valid_params else 'none'}"
+                    )
+                    logger.warning(error)
+                    return False, error
+
+        # 4. Validate enum values
         validation_result = self._validate_enum_values(method_call)
         if not validation_result[0]:
             return validation_result
 
-        # 4. Validate sort parameters
+        # 5. Validate sort parameters
         if method_call.sort_by:
             valid_sort_fields = {
                 "priority",
@@ -106,7 +164,7 @@ class MethodCallValidator:
                 logger.warning(error)
                 return False, error
 
-        # 5. Validate aggregation parameters
+        # 6. Validate aggregation parameters
         if method_call.aggregate:
             valid_aggregates = {"count", "group_by"}
             if method_call.aggregate not in valid_aggregates:

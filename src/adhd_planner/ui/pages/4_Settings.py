@@ -4,11 +4,15 @@ import streamlit as st
 
 from adhd_planner.core.session_manager import SessionManager
 from adhd_planner.core.settings_manager import SettingsManager
+from adhd_planner.ui.styles import apply_adhd_theme
 from adhd_planner.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
 st.set_page_config(page_title="Settings - ADHD Planner", page_icon="⚙️", layout="wide")
+
+# Apply ADHD-friendly theme
+apply_adhd_theme()
 
 SessionManager.initialize()
 

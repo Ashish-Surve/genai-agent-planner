@@ -5,6 +5,21 @@ from datetime import datetime
 
 import streamlit as st
 
+# ADHD-friendly priority colors (softer, less jarring)
+PRIORITY_COLORS = {
+    "urgent": "#E07A5F",  # Coral red
+    "high": "#F4A261",  # Soft orange
+    "medium": "#F2CC8F",  # Soft yellow
+    "low": "#81B29A",  # Sage green
+}
+
+PRIORITY_ICONS = {
+    "urgent": "🔴",
+    "high": "🟠",
+    "medium": "🟡",
+    "low": "🟢",
+}
+
 
 def task_card(
     task_id: str,
@@ -15,6 +30,7 @@ def task_card(
     due_date: datetime | None = None,
     on_complete: Callable[[str], None] | None = None,
     on_delete: Callable[[str], None] | None = None,
+    on_edit: Callable[[str], None] | None = None,
 ) -> None:
     """
     Display a task card.
@@ -22,26 +38,36 @@ def task_card(
     Args:
         task_id: Unique task identifier
         title: Task title
-        priority: Priority level (high, medium, low)
-        status: Task status (pending, in_progress, completed)
+        priority: Priority level (urgent, high, medium, low)
+        status: Task status (not_started, in_progress, completed, blocked)
         estimated_minutes: Estimated duration in minutes
         due_date: Optional due date
         on_complete: Callback when task is completed
         on_delete: Callback when task is deleted
+        on_edit: Callback when task edit is requested
     """
-    # Priority colors (case-insensitive)
-    priority_colors = {
-        "urgent": "🔴",
-        "high": "🔴",
-        "medium": "🟡",
-        "low": "🟢",
-    }
-
     # Status indicators (handle both uppercase and lowercase)
     is_completed = status.upper() == "COMPLETED"
+    priority_lower = priority.lower()
+
+    # Get priority color for border
+    border_color = PRIORITY_COLORS.get(priority_lower, "#F2CC8F")
 
     with st.container():
-        col1, col2, col3 = st.columns([0.5, 8, 1.5])
+        # Apply custom styling for the card
+        st.markdown(
+            f"""
+            <div style="
+                border-left: 4px solid {border_color};
+                padding-left: 12px;
+                margin-bottom: 4px;
+            ">
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        col1, col2, col3 = st.columns([0.5, 7.5, 2])
 
         with col1:
             # Checkbox for completion
@@ -60,7 +86,7 @@ def task_card(
         with col2:
             # Task title with strikethrough if completed
             title_display = f"~~{title}~~" if is_completed else f"**{title}**"
-            priority_icon = priority_colors.get(priority.lower(), "⚪")
+            priority_icon = PRIORITY_ICONS.get(priority_lower, "⚪")
 
             st.markdown(f"{priority_icon} {title_display}")
 
@@ -77,13 +103,27 @@ def task_card(
             if due_date:
                 details.append(f"📅 {due_date.strftime('%b %d')}")
 
+            # Show status if not completed
+            if not is_completed and status.upper() != "NOT_STARTED":
+                status_display = status.replace("_", " ").title()
+                details.append(f"📊 {status_display}")
+
             if details:
                 st.caption(" • ".join(details))
 
         with col3:
-            if st.button("🗑️", key=f"task_del_{task_id}", help="Delete task"):
-                if on_delete:
-                    on_delete(task_id)
+            # Action buttons in a row
+            btn_col1, btn_col2 = st.columns(2)
+
+            with btn_col1:
+                if st.button("✏️", key=f"task_edit_{task_id}", help="Edit task"):
+                    if on_edit:
+                        on_edit(task_id)
+
+            with btn_col2:
+                if st.button("🗑️", key=f"task_del_{task_id}", help="Delete task"):
+                    if on_delete:
+                        on_delete(task_id)
 
         st.markdown("---")
 
@@ -92,6 +132,7 @@ def task_list(
     tasks: list,
     on_complete: Callable[[str], None] | None = None,
     on_delete: Callable[[str], None] | None = None,
+    on_edit: Callable[[str], None] | None = None,
 ) -> None:
     """
     Display a list of task cards.
@@ -100,6 +141,7 @@ def task_list(
         tasks: List of task dicts/objects
         on_complete: Callback when a task is completed
         on_delete: Callback when a task is deleted
+        on_edit: Callback when a task edit is requested
     """
     if not tasks:
         st.info("No tasks to display. Add your first task!")
@@ -117,6 +159,7 @@ def task_list(
                 due_date=task.get("due_date"),
                 on_complete=on_complete,
                 on_delete=on_delete,
+                on_edit=on_edit,
             )
         else:
             # Handle TaskModel objects with correct attribute names
@@ -130,4 +173,5 @@ def task_list(
                 due_date=getattr(task, "deadline", None),
                 on_complete=on_complete,
                 on_delete=on_delete,
+                on_edit=on_edit,
             )

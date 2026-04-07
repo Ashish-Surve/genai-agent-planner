@@ -215,7 +215,59 @@ Update this section as you complete stories:
 - **Hours Invested**: ~44 hours
 - **Estimated Remaining**: ~45 hours
 
+### Recent Enhancements
+
+#### ADHD-XXX: Multi-Turn Scheduling Conversation Flow (2025-01-04)
+
+**Enhancement**: SchedulingAgent now supports interactive multi-turn conversations for schedule confirmation.
+
+**Features Implemented**:
+1. **Pending Schedule Tracking**: Stores schedule suggestions in context awaiting user confirmation
+2. **Confirmation Flow**: User can say "yes", "confirm", "schedule it" to create time blocks
+3. **Cancellation**: User can say "no", "cancel" to discard pending schedule
+4. **Modification**: User can say "skip task 2" to remove tasks before confirming
+5. **Context Persistence**: ChatHandler maintains context between turns for multi-step workflows
+6. **Supervisor Routing**: Supervisor detects pending actions and routes back to appropriate agent
+
+**Conversation Example**:
+```
+User: "Plan my day"
+Agent: Shows schedule with times, asks for confirmation
+User: "skip task 2"
+Agent: Removes task, shows updated schedule
+User: "yes"
+Agent: Creates time blocks, confirms schedule
+```
+
+**Files Modified**:
+- `src/adhd_planner/agents/scheduling_agent.py` - Added multi-turn confirmation flow
+- `src/adhd_planner/agents/supervisor.py` - Added `_check_pending_actions()` for routing
+- `src/adhd_planner/core/chat_handler.py` - Added persistent context between turns
+- `src/adhd_planner/ui/pages/1_Chat.py` - Clear context on chat reset
+- `src/adhd_planner/ui/pages/3_Calendar.py` - Fixed TimeBlock display (energy_level/block_type string handling)
+
 ### Recent Bug Fixes
+
+#### ADHD-XXX: Fixed TaskService Query Translation Errors (2025-01-04)
+
+**Issue**: LLM translating natural language queries generated invalid method calls, e.g., `list_tasks(['deadline'])` which caused `TypeError: unexpected keyword argument`.
+
+**Root Causes Identified**:
+1. Missing parameter validation in `MethodCallValidator` - only checked required params, not invalid extra params
+2. Missing methods in `TaskService` that were defined in the LLM prompt (`search_by_title`, `find_by_energy_level`, `get_statistics`)
+3. No `find_due_soon` method for "tasks for today" type queries
+4. LLM prompt lacked explicit examples for date-based queries
+
+**Fixes Applied**:
+1. Added `VALID_PARAMS` dictionary to `MethodCallValidator` to validate allowed parameters per method
+2. Added parameter validation step in `validate()` to reject invalid parameters with helpful error messages
+3. Added missing wrapper methods to `TaskService`: `search_by_title()`, `find_by_energy_level()`, `get_statistics()`, `find_due_soon()`
+4. Updated LLM prompt (`unified_query_prompts.py`) with new `find_due_soon` method and examples for "tasks for today" / "tasks due this week" queries
+
+**Files Modified**:
+- `src/adhd_planner/services/query_validator.py` - Added `VALID_PARAMS`, parameter validation, `find_due_soon` to valid methods
+- `src/adhd_planner/services/task_service.py` - Added `search_by_title()`, `find_by_energy_level()`, `get_statistics()`, `find_due_soon()`
+- `src/adhd_planner/utils/prompts/unified_query_prompts.py` - Added `find_due_soon` method docs and examples 13-14
 
 #### ADHD-22: Fixed Chat and Tasks Page Synchronization (2024-12-24)
 

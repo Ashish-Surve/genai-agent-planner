@@ -391,6 +391,55 @@ class TaskService:
         in_progress = self.repository.find_by_status("IN_PROGRESS")
         return not_started + in_progress
 
+    def search_by_title(self, query: str) -> list[TaskModel]:
+        """
+        Search tasks by title (case-insensitive partial match).
+
+        Args:
+            query: Search string
+
+        Returns:
+            List of matching tasks
+        """
+        query = validate_not_empty(query, "query")
+        return self.repository.search_by_title(query)
+
+    def find_by_energy_level(self, energy_level: str) -> list[TaskModel]:
+        """
+        Find tasks requiring a specific energy level.
+
+        Args:
+            energy_level: Energy level (LOW, MEDIUM, HIGH)
+
+        Returns:
+            List of tasks requiring that energy level
+        """
+        energy_level = validate_enum_value(energy_level, ["LOW", "MEDIUM", "HIGH"], "energy_level")
+        return self.repository.find_by_energy_level(energy_level)
+
+    def get_statistics(self) -> dict:
+        """
+        Get task statistics.
+
+        Returns:
+            Dictionary with task counts by status and overdue count
+        """
+        return self.repository.get_statistics()
+
+    def find_due_soon(self, hours: int = 24) -> list[TaskModel]:
+        """
+        Find tasks due within the specified number of hours.
+
+        Args:
+            hours: Number of hours to look ahead (default 24 for today)
+
+        Returns:
+            List of tasks due within the timeframe
+        """
+        if hours < 1:
+            hours = 24
+        return self.repository.find_due_soon(hours)
+
     def _dependencies_satisfied(self, task: TaskModel) -> bool:
         """
         Check if all task dependencies are satisfied.
